@@ -1,0 +1,118 @@
+<drac2>
+return_title = ''
+return_desc = ''
+return_fields = ''
+return_footer = '-footer "Developed by Dr Turtle#1771 | !psiknight help"'
+
+psiR=load_json(get("subclass"))['FighterLevel'] if exists("FighterLevel") and FighterLevel>=3 else None
+psiRL=FighterLevel if psiR=="Psi Knight" else 0
+dieL="12" if psiRL > 16 else "10" if psiRL > 10 else "8" if psiRL > 4 else "6"
+
+
+command = args[0] if len(args) > 0 else 'help' # Get command or help
+command = command.lower() # Lowercase command
+if command == 'help':
+    return_title = '-title "Psi Knight Help"'
+    return_desc += f'''-desc """
+    `!psiknight help` - Shows this page.
+    `!psiknight rest` - Resets Psi Die for Long Rest.
+    `!psiknight field` - Use your Protective Field Feature.
+    `!psiknight replenish` - Use your Psi Replenishment Feature.
+    `!psiknight leap` - Use your Psi-Powered Leap.
+    `!psiknight strike` - Use your Telekenetic Strike Feature.
+    '''
+    return_desc += '\n`!psiknight thrust` - Use your Psionic Thrust Feature.' if psiRL >= 7 else ''
+    return_desc += '"""'
+elif psiRL == 0:
+    # Check to make sure they are a Psi Knight
+    return_title = '-title "You are not a Psi-Knight!"'
+    return_desc = '-desc "Make sure your subclass is setup with `!level`"'
+    return ''
+elif command == 'reset' or command == 'rest':
+    # Command for LR
+    set_cvar_nx('psiDie', f'{dieL}') # Create CVAR if not exist
+    oldPsi = psiDie # Set oldPsi to psiDie variable before reset
+    set_cvar('psiDie', f'{dieL}') # Reset die
+    set_cvar('MpsiDie', f'{dieL}') # Reset max die
+    return_title = '-title "Psionic Resting"'
+    return_desc = '-desc "You take a long rest and regain your psionic energy"'
+    return_fields = f'''-f """Display| Soulknife Level - {psiRL}
+                              Die Max - 1d{MpsiDie}
+                              Rested - 1d{oldPsi} -> 1d{psiDie}
+                           """
+                     '''
+elif command == 'replenishment' or command == 'replenish':
+    cc = 'Psi Replenishment'
+    create_cc_nx(cc, 0, 1, 'long', 'bubble')
+    if get_cc(cc) == 0:
+        return_title = f'-title "{name} tries to use their {cc} feature!"'
+        return_desc = f'-desc "You cannot use this feature until you finish a long rest"'
+        return_fields = f'-f "{cc}|{cc_str(cc)}"'
+        return ''
+    mod_cc(cc, -1)
+    return_title = f'-title "{name} uses their {cc} feature!"'
+    return_desc = '-desc "As a bonus action, you can calm your mind for a moment and restore your Psionic Talent die to its starting size. You then can\'t use Psi Replenishment again until you finish a long rest."'
+    oldPsi = psiDie
+    set_cvar('psiDie', f'{MpsiDie}')
+    return_fields += f'-f """Psi Replenishment| {cc_str(cc)}"""\n'
+    return_fields += f'-f """Updated Psionic Talent Die| 1d{oldPsi} -> 1d{psiDie}"""'
+elif command == 'field' or command == 'protective':
+    return_title = f'-title "{name} uses their Protective Field feature!"'
+    return_desc = '-desc "When you or another creature you can see within 30 feet of you takes damage, you can use your reaction to roll your Psionic Talent die and reduce the damage taken by the number rolled plus your Intelligence modifier (minimum reduction of 1), as you create a momentary shield of telekinetic force."'
+    psiDown = int(psiDie) - 2 # Calculate possible down value
+    psiDown = psiDown if psiDown >= 4 else 0 # Only set down value if die is not d4
+    psiUp=int(psiDie) + 2
+    psiUp=psiUp if psiUp<=int(MpsiDie) else int(MpsiDie)
+    mod = intelligenceMod if intelligenceMod > 1 else 1
+    psi = vroll(f'1d{psiDie}+{mod}')
+    if psi is None:
+        err('Your Psionic Talent is currently unusable')
+    dice = psi.total - mod
+    set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
+    set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
+    return_fields += f'-f """Psionic Talent Die Roll| {str(psi)}"""\n'
+    return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
+elif command == 'leap':
+    return_title = f'-title "{name} uses their Psi-Powered Leap!"'
+    return_desc = f'-desc "When you make a high or long jump, you can roll your Psionic Talent die and extend the distance of the jump, up to a number of feet equal to twice the number rolled plus twice your Intelligence modifier (minimum of 1 extra foot). This extra distance costs you only 1 foot of movement."'
+    psiDown = int(psiDie) - 2 # Calculate possible down value
+    psiDown = psiDown if psiDown >= 4 else 0 # Only set down value if die is not d4
+    psiUp=int(psiDie) + 2
+    psiUp=psiUp if psiUp<=int(MpsiDie) else int(MpsiDie)
+    mod = intelligenceMod*2 if intelligenceMod*2 > 1 else 1
+    psi = vroll(f'1d{psiDie}+{mod}')
+    if psi is None:
+        err('Your Psionic Talent is currently unusable')
+    dice = psi.total - mod
+    set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
+    set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
+    return_fields += f'-f """Psionic Talent Die Roll| {str(psi)}"""\n'
+    return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
+elif command == 'strike':
+    return_title = f'-title "{name} uses their Telekenetic Strike."'
+    return_desc = '-desc "You can propel your attacks with telekinetic force. Once on each of your turns, immediately after you deal damage to a target within 30 feet of you with a weapon attack, you can roll your Psionic Talent die and also deal force damage to the target equal to the number rolled."'
+    psiDown = int(psiDie) - 2 # Calculate possible down value
+    psiDown = psiDown if psiDown >= 4 else 0 # Only set down value if die is not d4
+    psiUp=int(psiDie) + 2
+    psiUp=psiUp if psiUp<=int(MpsiDie) else int(MpsiDie)
+    psi = vroll(f'1d{psiDie}')
+    if psi is None:
+        err('Your Psionic Talent is currently unusable')
+    set_cvar('psiDie', f'{psiDown}') if psi.total == int(psiDie) else None
+    set_cvar('psiDie', f'{psiUp}') if psi.total == 1 else None
+    return_fields += f'-f """Psionic Talent Die Roll| {str(psi)}"""\n'
+    return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
+elif command == 'thrust':
+    if psiRL < 7:
+        return_title = f'-title "{name} cannot use this feature!"'
+        return_desc = f'-desc "You must be at least a 7th level Psi Knight to use Psionic Thrust."'
+        return ''
+    return_title = f'-title "{name} uses their Psionic Thrust."'
+    return_desc = '-desc "When you deal damage to a target with the Telekinetic Strike of your Psionic Talent, you can force the target to make a Strength saving throw against a DC equal to 8 + your proficiency bonus + your Intelligence modifier. Unless the save succeeds, you can knock the target prone or move it up to 10 feet in any direction horizontally."'
+    return_fields = '-f "To use this feature and others, run `!cvar resources ["44c46e80-428a-46b9-a0fa-fde880beb53d"]`"'
+</drac2>
+{{return_title}}
+{{return_desc}}
+{{return_fields}}
+{{return_footer}}
+-thumb <image> -color <color>

@@ -1,0 +1,1 @@
+!alias eck-oppor embed -title "<name> makes an opportunity attack with their echo!" -desc "When a creature that you can see within 5 feet of your echo moves at least 5 feet away from it, you can use your reaction to make an opportunity attack against that creature as if you were in the echo’s space." -thumb <image>

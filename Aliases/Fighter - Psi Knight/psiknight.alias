@@ -1,0 +1,3 @@
+!alias psiknight tembed
+{{f'''{'{'*2}args=&ARGS&{'}'*2}'''}}
+{{get_gvar("a30f94cb-00ae-4f97-a393-3e0da03078d4")}}

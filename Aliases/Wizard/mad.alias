@@ -1,0 +1,1 @@
+!alias mad i effect %1% "Mage Armor" -ac {{13+dexterityMod}}

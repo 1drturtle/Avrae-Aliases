@@ -1,0 +1,21 @@
+!alias pearl embed -title "***<name> uses their Pearl of Power!***" 
+-desc "While this pearl is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you have used the pearl, it can't be used again until the next dawn."
+<drac2>
+create_cc_nx("Pearl of Power", 0, 1, None, 'bubble')
+a=&ARGS&
+changed = False
+if len(a) == 1:
+    L=int(a[0]) if int(a[0]) <= 3 else 3
+    changed = True
+    slot,slot_m=get_slots(L),get_slots_max(L)
+else:
+    err("Slot Level Not Provided")
+if slot == slot_m:
+    err(f"Spell Slot Level {L} already max.")
+mod_cc("Pearl of Power", -1, True)
+set_slots(L, slot+1)
+</drac2>
+{{f'-f "Spell Slots|{slots_str(L)}"'}}
+-f "Remaining Charges|{{cc_str('Pearl of Power')}}" 
+-image "https://cdn.discordapp.com/attachments/524037599002624010/680816192948011047/450px-Neck_Slot_1.png"
+-thumb <image> -color <color>

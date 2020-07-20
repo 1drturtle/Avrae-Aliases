@@ -1,0 +1,1 @@
+!alias waf cast fireball{{args=argparse(&ARGS&)}}{{lvl=int(args.get('l')[0]) if args.get('l') else 3}} -l {{lvl}} -i -dc 15 -f 'Remaining Charges ({{lvl*-1+2}})|{{mod_cc("Laser Beam", lvl*-1+2, True)}}{{cc_str("Laser Beam")}}' -title "{{name}} shoots a Laser Beam!"

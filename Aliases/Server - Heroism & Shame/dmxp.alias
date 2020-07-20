@@ -1,0 +1,17 @@
+!alias dmxp embed -thumb <image> -color <color> {{args=&ARGS&}}{{uv='DMXP'}}{{dmxp=int(get(uv, 0))}}{{set_uvar_nx(uv, dmxp)}}
+<drac2>
+return_title = '-title "'
+return_fields = ''
+if len(args) == 1:
+    amount = int(args[0])
+    return_title += f'{name} gains {amount} DM XP!"' if amount >= 0 else f'{name} removes {amount*-1} DM XP!"'
+    dmxp += amount
+    return_fields = f'-f "DM XP|{dmxp}"'
+    set_uvar(uv, dmxp)
+else:
+    return_title += f'{name} checks their DM XP!"'
+    return_fields = f'-f "DM XP|{dmxp}"'
+</drac2>
+{{return_title}}
+{{return_fields}}
+-footer '!dmxp [amount] | Developed by Dr Turtle'

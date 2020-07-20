@@ -1,0 +1,1 @@
+!alias eck-swap embed -title "<name> swaps places with their echo" -desc "As a bonus action, you can teleport, magically swapping places with your echo at a cost of 15 feet of your movement, regardless of the distance between the two of you." -thumb <image> -color <color>
