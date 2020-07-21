@@ -1,0 +1,8 @@
+!alias rod embed -title "<name> Uses Their Rod of the Pact Keeper!"
+{{err("No Warlock Levels found") if not exists("WarlockLevel") else None}}
+{{highest=[x for x in range(6) if get_slots_max(x) or x==0][-1]}}
+{{create_cc_nx("Rod of the Pact Keeper", 0, 1, "long", "bubble")}}
+{{set_slots(highest, min(get_slots(highest)+1, get_slots_max(highest)))}}  -desc "As an action while holding the rod <name> can regain 1 warlock spell slot, once per long rest." -f "Spell Slots|{{slots_str(highest)}}"
+{{mod_cc("Rod of the Pact Keeper", -1)}} 
+-f "Remaining Charge | {{cc_str('Rod of the Pact Keeper')}}"
+-color <color> -thumb <image>

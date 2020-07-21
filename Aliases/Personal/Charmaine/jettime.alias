@@ -1,0 +1,11 @@
+!alias jettime embed -title "Remaining Jet Time" -thumb <image> -color <color> <drac2>
+jet_name = "Jet Propulsion"
+create_cc_nx(jet_name, 0, 240)
+jet = get_cc(jet_name)
+jet_hours = int(jet/60)
+jet_minutes = int(jet%60) if jet_hours > 0 else jet
+jet_hours_plural = '' if jet_hours == 1 else 's'
+jet_minutes_plural = '' if jet_minutes == 1 else 's'
+time_field = f'Remaining Time|{jet_hours} hour{jet_hours_plural} and {jet_minutes} minute{jet_minutes_plural}'
+</drac2>
+-f "{{time_field}}"

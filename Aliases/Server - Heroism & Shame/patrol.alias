@@ -1,0 +1,12 @@
+!alias patrol embed -title "Downtime: Patrol"
+{{args = argparse(&ARGS&)}}
+{{R="2d20kh1+" if args.adv()==1 else "2d20kl1+" if args.adv()==-1 else "1d20+"}}
+{{perception=get_raw().skills['perception']}}
+{{investigation=get_raw().skills['investigation']}}
+{{modifier=max(perception, investigation)}}
+{{bonus="+"+str(args.get('b')[0]) if args.get('b') else ""}}
+{{patrol=vroll(R+str(modifier)+str(bonus))}}
+-desc "<name> attempts to patrol"
+-f "Perception/Investigation|{{str(patrol)}}"
+-f "DT|{{mod_cc("DT Slot", -1)}}{{cc_str("DT Slot")}}"
+-thumb <image> -color <color>

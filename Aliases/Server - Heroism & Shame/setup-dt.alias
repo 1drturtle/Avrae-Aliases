@@ -1,0 +1,7 @@
+!alias setup-dt embed -title "**Setting up DT**"
+{{create_cc_nx("DT Slot", 0, 2, None, "bubble")}}{{create_cc_nx("Training", 0, 20, 'none', None)}}{{set_cc("Training", 0)}}
+-desc """
+DT Slots:       {{cc_str("DT Slot")}}
+Training Count: {{cc_str("Training")}}
+"""
+-thumb <image> -color <color>

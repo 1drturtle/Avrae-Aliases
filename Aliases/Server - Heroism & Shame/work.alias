@@ -1,0 +1,3 @@
+!alias work tembed -title "**Work DT**" -thumb <image> -color <color>
+{{f'''{'{'*2}pargs=argparse(&ARGS&){'}'*2}'''}}
+{{get_gvar("a1b88e55-6e85-437e-9575-419fdb99af2d")}}
