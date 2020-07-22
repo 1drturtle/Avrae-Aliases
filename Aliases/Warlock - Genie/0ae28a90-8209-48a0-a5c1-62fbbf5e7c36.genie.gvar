@@ -1,0 +1,40 @@
+<drac2>
+return_title = ''
+return_desc = ''
+return_fields = ''
+return_footer = '-footer "!genie help | Dr Turtle#1771"'
+
+genieL=load_json(get("subclass"))['WarlockLevel'] if exists("WarlockLevel") and WarlockLevel>=1 else None
+genieRL=WarlockLevel if genieL=="The Genie" else 0
+
+command = args[0].lower() if len(args) > 0 else 'help' # Get command or help
+if command == 'help':
+    return_title = '-title "Genie Help"'
+    return_desc += f'''-desc """
+    `!genie help` - Shows this page.
+    `!genie respite` - Use your Bottled Respite feature.
+    '''
+    return_desc += '"""'
+elif genieRL == 0:
+    # Check to make sure they are a Genielock
+    return_title = '-title "You are not a Genie Warlock!"'
+    return_desc = '-desc "Make sure your subclass is setup with `!level`"'
+    return ''
+elif command == 'respite':
+    cc = "Genie's Vessel: Bottled Respite"
+    create_cc_nx(cc, 0, 1, 'long', 'bubble')
+    if not get_cc(cc):
+        return_title = f'-title "{name} cannot use their Bottled Respite!"'
+        return_desc = '-desc "You must take a long rest before you can use this ability again."'
+        return_fields = f'-f "{cc}|{cc_str(cc)}"'
+        return ''
+    return_title = f'-title "{name} uses their Bottled Respite!"'
+    return_desc = f'-desc "As an action, you can magically vanish and enter your vessel, which remains in the space you left. The interior of the vessel is an extradimensional space in the shape of a 20-foot-radius cylinder, 20 feet high, and resembles your vessel. The interior is comfortably appointed with cushions and low tables and is a comfortable temperature. While inside, you can hear the area around your vessel as if you were in its space. You can remain inside the vessel up to a number of hours equal to twice your proficiency bonus. You exit the vessel early if you use a bonus action to leave, if you die, or if the vessel is destroyed. When you exit the vessel, you appear in the unoccupied space closest to it. Any objects left in the vessel remain there until carried out, and if the vessel is destroyed, every object stored there harmlessly appears in the unoccupied spaces closest to the vessel’s former space. Once you enter the vessel, you can’t enter again until you finish a long rest."'
+    mod_cc(cc, -1)
+    return_fields = f'-f "{cc} (-1)|{cc_str(cc)}"'
+</drac2>
+{{return_title}}
+{{return_desc}}
+{{return_fields}}
+{{return_footer}}
+-thumb <image> -color <color>

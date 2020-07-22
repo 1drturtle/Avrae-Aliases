@@ -1,0 +1,7 @@
+!alias piety embed
+{{c,n,a=f'{god} Piety',f'{god.lower()}Piety',(&ARGS&[0] if &ARGS& else '')}}
+{{set_cvar_nx(n,(str(get_cc(c)) if cc_exists(c) else 0))}}{{set_cvar(n,str(get(c))) if exists(c) else ''}}{{delete_cc(c) if cc_exists(c) else ''}}{{delete_cvar(c) if exists(c) else ''}}
+{{p=get(n)}}{{set_cvar(n,str(int(p)+int(a))) if a else ''}}
+-color <color> -thumb <image>
+{{f'-title "{name} gains {a} point{"" if int(a)==1 else "s"} of Piety with {god}!"' if a else ''}}
+-f 'Current {{god}} Piety Points:|{{get(n)}}'
