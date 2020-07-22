@@ -1,0 +1,7 @@
+!alias blur embed -title "<name> uses Blurred Movement" -desc "Whenever you take the Dash Action or Action Surge or use your Unleash Incarnation feature , your under the effects of the Blur spell until the end of your next turn" -color <color> -thumb <image>
+<drac2>
+c = combat() if combat() and combat().me else None
+if c:
+    c.me.add_effect('Blurred', 'end', 1)
+    return f'-f "Effect Added|Blurred"'
+</drac2>
