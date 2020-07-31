@@ -32,7 +32,40 @@ roll_str+=str(skill_b) # Append the skill bonus to the finished base roll string
 if pargs.get("b"):					# If there is one or more bonuses passed to the alias
 	for bonus in pargs.get("b"):    # Loop through every one passed
 		roll_str += f'+{bonus}'     # And append it to the roll string
-
+</drac2>
+<drac2>
+# Take away money (if applicable)
+coin_string = ''
+if exists('cost'):
+    plat_cost = int(cost/10)
+    # Add coins to bag
+    bags_before = load_json(get('bags', 0))
+    if bags_before is not 0:
+        coin_bag_before = [bag for bag in bags_before if bag[0] == 'Coin Pouch'][0]
+        index = bags_before.index(coin_bag_before)
+        bag = coin_bag_before[1]
+        # Check for Platnium first
+        if bag.pp >= plat_cost:
+            plat_before = bag.pp
+            bag['pp'] -= plat_cost
+            plat_after = bag.pp
+            coin_string = f'-f "Removed Coins|{plat_before} pp -> {plat_after} pp"'
+        # Then, check for gold
+        elif bag.gp >= cost:
+            gold_before = bag.gp
+            bag['gp'] -= cost
+            gold_after = bag.gp
+            coin_string = f'-f "Removed Coins|{gold_before} gp -> {gold_after} gp"'
+        else:
+            err("Not enough funds to do this training!")
+        # Reset coin pouch
+        coin_bag_after = ['Coin Pouch', bag]
+        bags_before[index] = coin_bag_after
+        set_cvar('bags', dump_json(bags_before))
+    else:
+        err('No coin bag found.')
+</drac2>
+<drac2>
 R = vroll(roll_str) # Roll the dice
 crit_type = int(R.result.crit) # Store 0 (normal), 1 (crit success), 2 (crit fail) into variable
 success = True if R.total >= dc else False # Check to see if we passed
@@ -64,3 +97,4 @@ Remaining DTD slot: **{{mod_cc("DT Slot", -dt_amount)}}{{cc_str("DT Slot")}}**
 {{"You **passed** the DC "+str(dc)+"!" if success else None}}{{"You **failed** the DC "+str(dc)+"!" if not success else None}}{{"\n**Crit Success!**" if crit_type==1 else None}}{{"\n**Crit Failure!**" if crit_type==2 else None}}
 Training Progress: {{cc_str(train_c)}} ({{"+" if mod_amount>0 else ""}}{{mod_amount}}){{f'\nYou finished training {args[1]}!' if get_cc(train_c)>=days else None}}
 """
+{{coin_string}}
