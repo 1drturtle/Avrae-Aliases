@@ -76,3 +76,4 @@ if pargs.get("w"):
 else:
     return "-title \"**"+name+" doing Work DT\"**"
 </drac2>
+-footer '!work | Dr Turtle#1771'

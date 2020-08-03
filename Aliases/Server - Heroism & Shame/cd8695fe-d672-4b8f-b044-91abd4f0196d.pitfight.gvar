@@ -1,0 +1,43 @@
+<drac2>
+# Globals
+args = argparse(args)
+skill_list = get_raw().skills
+
+dc_1 = 15
+dc_2 = 20
+dc_3 = 20
+
+# Return Variables
+return_title = '-title "Pit-Fighting"'
+return_desc = ''
+return_fields = ''
+return_footer = '-footer "!pitfight help | Dr Turtle#1771"'
+
+# If Help arg is passed, display help:
+if args.get('help'):
+	return_title = '-title "Pit Fighting - Help"'
+	return_desc = '-desc "To use this command, do `!pitfight` If you have adv on all checks, add `adv`. If you have adv on one of the checks, use `adv1`, `adv2`, etc."'
+	return ''
+
+# Find which check to use
+firstcheck_skillb = max([(skill_list['athletics'], 'Athletics'), (skill_list['acrobatics'], 'Acrobatics'), (skill_list['performance'], 'performance')])
+
+# If global advantage or adv1 arg is passed
+if args.adv() == 1 or args.get('adv1'):
+	firstcheck_roll = vroll(f'2d20kh1+{firstcheck_skillb[0]}')
+elif args.adv() == -1 or args.get('dis1'):
+	firstcheck_roll = vroll(f'2d20kl1+{firstcheck_skillb[0]}')
+else:
+	firstcheck_roll = vroll(f'1d20+{firstcheck_skillb[0]}')
+
+# Second check, determine whether they have athletics proficiency
+secondcheck_prof = strengthMod+proficiencyBonus == skill_list['athletics']
+secondcheck_skillb = constitutionMod+proficiencyBonus if secondcheck_prof else constitutionMod
+
+
+</drac2>
+{{return_title}}
+{{return_desc}}
+{{return_fields}}
+{{return_footer}}
+-thumb <image> -color <color>

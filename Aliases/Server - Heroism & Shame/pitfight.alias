@@ -1,0 +1,3 @@
+!alias pitfight tembed
+{{f'''{'{'*2}args=&ARGS&{'}'*2}'''}}
+{{get_gvar("cd8695fe-d672-4b8f-b044-91abd4f0196d")}}
