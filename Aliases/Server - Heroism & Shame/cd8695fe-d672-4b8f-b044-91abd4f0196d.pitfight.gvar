@@ -48,22 +48,49 @@ else:
 # Third check, logic of first and second combined
 thirdcheck_prof = charismaMod+proficiencyBonus == skill_list['intimidation']
 thirdcheck_skillb_one = strengthMod+proficiencyBonus if thirdcheck_prof else strengthMod
-firstcheck_skillb = max([(thirdcheck_skillb_one, 'Intimidation (Strength)'), (skill_list['persuasion'], "Persuasion")])
+thirdcheck_skillb = max([(thirdcheck_skillb_one, 'Intimidation (Strength)'), (skill_list['persuasion'], "Persuasion")])
 # If global advantage or adv3 arg is passed
 if args.adv() == 1 or args.get('adv1'):
-	thirdcheck_roll = vroll(f'2d20kh1+{firstcheck_skillb[0]}')
+	thirdcheck_roll = vroll(f'2d20kh1+{thirdcheck_skillb[0]}')
 elif args.adv() == -1 or args.get('dis1'):
-	thirdcheck_roll = vroll(f'2d20kl1+{firstcheck_skillb[0]}')
+	thirdcheck_roll = vroll(f'2d20kl1+{thirdcheck_skillb[0]}')
 else:
-	thirdcheck_roll = vroll(f'1d20+{firstcheck_skillb[0]}')
+	thirdcheck_roll = vroll(f'1d20+{thirdcheck_skillb[0]}')
 
 # First roll, check
 if firstcheck_roll.total >= dc_1:
 	successes += 1
-	return_fields += f'-f "Display |{firstcheck_skillb[1]}: {str(firstcheck_roll)} <:white_check_mark:739935740447686769>"' # Display (Skill used)
+	return_fields += f'-f "Display Check, DC {dc_1}|{firstcheck_skillb[1]}: {str(firstcheck_roll)} <:white_check_mark:739935740447686769>"' # Display (Skill used)
 else:
 	return_fields += f'-f "Display |{firstcheck_skillb[1]}: {str(firstcheck_roll)} <:x:739936457904619621>"' # Display (Skill used)
-
+# Second roll, check
+return_fields += '\n'
+if secondcheck_roll.total >= dc_2:
+	successes += 1
+	return_fields += f'-f "Endurance Check, DC {dc_2}|Athletics (Constitution): {str(secondcheck_roll)} <:white_check_mark:739935740447686769>"'
+else:
+	lingering = True
+	return_fields += f'-f "Endurance Check, DC {dc_2}|Athletics (Constitution): {str(secondcheck_roll)} <:x:739936457904619621>"'
+# Third roll, check
+return_fields += '\n'
+if thirdcheck_roll.total >= dc_3:
+	successes += 1
+	return_fields += f'-f "Crowd Pleasing Check, DC {dc_3}|{thirdcheck_skillb[1]}: {str(thirdcheck_roll)} <:white_check_mark:739935740447686769>"'
+else:
+	return_fields += f'-f "Crowd Pleasing Check, DC {dc_3}|{thirdcheck_skillb[1]}: {str(thirdcheck_roll)} <:x:739936457904619621>"'
+# Calculate Gold
+gold_earned = 300 if successes == 3 else 200 if successes == 2 else 110 if successes == 1 else 0
+gold_earned += 50 if thirdcheck_roll.total > dc_3 else 0
+return_fields += '\n'
+return_fields += f'-f "Final Results|{successes} successes, {3-successes} failures.\n{gold_earned} gp"'
+# Calculate XP
+return_fields += '\n'
+return_fields += f'-f "XP|{200+(100 if secondcheck_roll.total > dc_2 else 0)}"'
+# Lingering Injury Check!
+return_fields += '\n' if lingering else None
+lingering_roll = vroll('1d4')
+lingering_result = lingering_list[str(lingering_roll.total)]
+return_fields += f'-f "Lingering Injury|{lingering_result}"' if lingering else None
 </drac2>
 {{return_title}}
 {{return_desc}}
