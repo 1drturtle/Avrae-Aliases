@@ -10,33 +10,35 @@ else:
 items = load_json(get_gvar(g))
 retrieve = False
 item = None
-too_long = False
-item2 = None
 command = 'tembed'
 # Trim sub-command and item name from all_args
 if len(args) > 2 and args[0] == "add":
     all_args = all_args[4:]
     all_args = all_args[len(args[1])+1:]
+    if len(all_args) > 2000:
+        err("Item too large!")
     items[args[1]] = all_args
     command = f'gvar edit {g} {dump_json(items)}'
-if len(args) == 2 and args[0] == "get":
+elif len(args) == 2 and args[0] == "get":
     retrieve = True
     item = items[args[1]]
-if len(args) == 2 and args[0] == "remove":
+elif len(args) == 2 and args[0] == "remove":
     if args[1] in items:
         items.pop(args[1])
         command = f'gvar edit {g} {dump_json(items)}'
-if len(args) == 1 and args[0] == "list":
+elif len(args) == 1 and args[0] == "list":
     command = 'tembed -title "List of Items"\n -f "Items|'
     for item in items:
         command += f'{item}\n'
     command += '" -thumb <image> -color <color>'
-if len(args) == 2 and args[0] == "set":
+elif len(args) == 2 and args[0] == "set":
     if args[1] != "default":
         set_uvar("items", args[1])
     else:
         delete_uvar("items")
     command = f'tembed -title "New Item List Set" -desc "Custom item list has been set to `{args[1]}`" -thumb <image> -color <color>'
+else:
+    command = f'echo Improper sub-command passed. Use `!getitem get key` to get an item or `!getiem list` to show current items.'
 return command
 </drac2>
 {{item if retrieve and item else None}}
