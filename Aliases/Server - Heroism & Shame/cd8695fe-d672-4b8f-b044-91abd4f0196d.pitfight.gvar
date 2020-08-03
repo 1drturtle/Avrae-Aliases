@@ -7,6 +7,10 @@ dc_1 = 15
 dc_2 = 20
 dc_3 = 20
 
+successes = 0
+lingering = False
+lingering_list = load_json(get_gvar('b40a1658-c07a-40fb-ac5d-5dba85b44c39'))
+
 # Return Variables
 return_title = '-title "Pit-Fighting"'
 return_desc = ''
@@ -33,7 +37,32 @@ else:
 # Second check, determine whether they have athletics proficiency
 secondcheck_prof = strengthMod+proficiencyBonus == skill_list['athletics']
 secondcheck_skillb = constitutionMod+proficiencyBonus if secondcheck_prof else constitutionMod
+# If global advantage or adv2 arg is passed
+if args.adv() == 1 or args.get('adv2'):
+	secondcheck_roll = vroll(f'2d20kh1+{secondcheck_skillb}')
+elif args.adv() == -1 or args.get('dis2'):
+	secondcheck_roll = vroll(f'2d20kl1+{secondcheck_skillb}')
+else:
+	secondcheck_roll = vroll(f'1d20+{secondcheck_skillb}')
 
+# Third check, logic of first and second combined
+thirdcheck_prof = charismaMod+proficiencyBonus == skill_list['intimidation']
+thirdcheck_skillb_one = strengthMod+proficiencyBonus if thirdcheck_prof else strengthMod
+firstcheck_skillb = max([(thirdcheck_skillb_one, 'Intimidation (Strength)'), (skill_list['persuasion'], "Persuasion")])
+# If global advantage or adv3 arg is passed
+if args.adv() == 1 or args.get('adv1'):
+	thirdcheck_roll = vroll(f'2d20kh1+{firstcheck_skillb[0]}')
+elif args.adv() == -1 or args.get('dis1'):
+	thirdcheck_roll = vroll(f'2d20kl1+{firstcheck_skillb[0]}')
+else:
+	thirdcheck_roll = vroll(f'1d20+{firstcheck_skillb[0]}')
+
+# First roll, check
+if firstcheck_roll.total >= dc_1:
+	successes += 1
+	return_fields += f'-f "Display |{firstcheck_skillb[1]}: {str(firstcheck_roll)} <:white_check_mark:739935740447686769>"' # Display (Skill used)
+else:
+	return_fields += f'-f "Display |{firstcheck_skillb[1]}: {str(firstcheck_roll)} <:x:739936457904619621>"' # Display (Skill used)
 
 </drac2>
 {{return_title}}
