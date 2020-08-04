@@ -50,9 +50,9 @@ thirdcheck_prof = charismaMod+proficiencyBonus == skill_list['intimidation']
 thirdcheck_skillb_one = strengthMod+proficiencyBonus if thirdcheck_prof else strengthMod
 thirdcheck_skillb = max([(thirdcheck_skillb_one, 'Intimidation (Strength)'), (skill_list['persuasion'], "Persuasion")])
 # If global advantage or adv3 arg is passed
-if args.adv() == 1 or args.get('adv1'):
+if args.adv() == 1 or args.get('adv3'):
 	thirdcheck_roll = vroll(f'2d20kh1+{thirdcheck_skillb[0]}')
-elif args.adv() == -1 or args.get('dis1'):
+elif args.adv() == -1 or args.get('dis3'):
 	thirdcheck_roll = vroll(f'2d20kl1+{thirdcheck_skillb[0]}')
 else:
 	thirdcheck_roll = vroll(f'1d20+{thirdcheck_skillb[0]}')
@@ -78,19 +78,41 @@ if thirdcheck_roll.total >= dc_3:
 	return_fields += f'-f "Crowd Pleasing Check, DC {dc_3}|{thirdcheck_skillb[1]}: {str(thirdcheck_roll)} <:white_check_mark:739935740447686769>"'
 else:
 	return_fields += f'-f "Crowd Pleasing Check, DC {dc_3}|{thirdcheck_skillb[1]}: {str(thirdcheck_roll)} <:x:739936457904619621>"'
-# Calculate Gold
-gold_earned = 300 if successes == 3 else 200 if successes == 2 else 110 if successes == 1 else 0
-gold_earned += 50 if thirdcheck_roll.total > dc_3 else 0
+</drac2>
+<drac2>
+# Final calculations
+# Pass/Fails
 return_fields += '\n'
-return_fields += f'-f "Final Results|{successes} successes, {3-successes} failures.\n{gold_earned} gp"'
-# Calculate XP
+return_fields += f'-f "Final Result|{successes} successes, {3-successes} failures!"'
+# Gold
 return_fields += '\n'
-return_fields += f'-f "XP|{200+(100 if secondcheck_roll.total > dc_2 else 0)}"'
-# Lingering Injury Check!
-return_fields += '\n' if lingering else None
-lingering_roll = vroll('1d4')
-lingering_result = lingering_list[str(lingering_roll.total)]
-return_fields += f'-f "Lingering Injury|{lingering_result}"' if lingering else None
+total_gp = 300 if successes == 3 else 200 if successes == 2 else 110 if successes == 1 else 0
+if thirdcheck_roll.total > dc_3:
+	total_gp += 50
+bags_before = load_json(get('bags', 0))
+if bags_before is not 0:
+    coin_bag_before = [bag for bag in bags_before if bag[0] == 'Coin Pouch'][0]
+    index = bags_before.index(coin_bag_before)
+    coins_before = coin_bag_before[1]['gp']
+    coin_bag_before[1]['gp'] += total_gp
+    coins_after = coin_bag_before[1]['gp']
+    return_fields += f'-f "Gold (+{total_gp})|{coins_after}gp"'
+    bags_before[index] = coin_bag_before
+    set_cvar('bags', dump_json(bags_before))
+# XP
+return_fields += '\n'
+xp_cc = 'Experience'
+before = get_cc(xp_cc)
+xp = 200
+if secondcheck_roll.total > dc_2:
+	xp += 100
+mod_cc(xp_cc, +xp)
+return_fields += f'-f "XP (+{xp})|{cc_str(xp_cc)}"'
+# Lingering
+if lingering:
+	return_fields += '\n'
+	lingering_roll = str(vroll('1d4').total)
+	return_fields += f'-f "Lingering Injury|{lingering_list[lingering_roll]}"'
 </drac2>
 {{return_title}}
 {{return_desc}}
