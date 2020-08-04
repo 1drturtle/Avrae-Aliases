@@ -93,10 +93,8 @@ bags_before = load_json(get('bags', 0))
 if bags_before is not 0:
     coin_bag_before = [bag for bag in bags_before if bag[0] == 'Coin Pouch'][0]
     index = bags_before.index(coin_bag_before)
-    coins_before = coin_bag_before[1]['gp']
     coin_bag_before[1]['gp'] += total_gp
-    coins_after = coin_bag_before[1]['gp']
-    return_fields += f'-f "Gold (+{total_gp})|{coins_after}gp"'
+    return_fields += f'-f "Gold (+{total_gp})|{coin_bag_before[1]['gp']}gp"'
     bags_before[index] = coin_bag_before
     set_cvar('bags', dump_json(bags_before))
 # XP
