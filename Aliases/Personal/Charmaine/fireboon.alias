@@ -1,6 +1,0 @@
-!alias fireboon embed -title "**Boon of the Fire Giant**" -color <color> -thumb <image>
--desc "*Your giant-kin heritage comes to light.*"
--f "**Fire Sight**|You gain the ability to, as an action, see invsible creatures around you in a radius of 30 ft. When you see creatures in this manner it is in shades of red and orange for one minute. You also gain darkvision with the same radius."
--f "**Forge of Fire**|When you make an ability check related to crafting, you may add your strength mod to the total."
--f "**Fire Giant Form**|You can channel your inner energy and summon a fire-giant form around you. For one minute, you gain the benefits of the Investiture of Fire spell. You can use this feature a number of times equal to your cleric level divided by 5, rounded down until you take a long rest."
--image "https://www.worldanvil.com/uploads/images/48714c8dad9f9e42780af7fd48bdea94.jpg"
