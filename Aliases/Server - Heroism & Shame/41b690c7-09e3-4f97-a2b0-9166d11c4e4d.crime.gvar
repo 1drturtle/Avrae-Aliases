@@ -1,0 +1,22 @@
+<drac2>
+args = argparse(AAA)
+dtcc = "DT Slot"
+heatcc = "Heat"
+credcc = "Street Cred"
+ch=character()
+ch.create_cc_nx(dtcc, 0, 2, None, 'bubble')
+ch.create_cc_nx(heatcc, 0)
+ch.create_cc_nx(credcc, 0)
+bonus_one, bonus_two, bonus_three = args.join('b1', '+'),args.join('b2', '+'),args.join('b3', '+')
+adv_one, adv_two, adv_three = args.get('adv1'), args.get('adv2'), args.get('adv3')
+ability_one = ch.skills['perception'] if ch.skills['perception'].value > ch.skills['investigation'].value else ch.skills['investigation']
+ability_two = ch.skills['stealth']
+ability_three = ch.skills['sleightOfHand'] if ch.skills['sleightOfHand'].value > ch.skills['performance'].value else ch.skills['performance']
+# First Check
+str_one = '2d20kh1' if (adv_one == True or ability_one.adv == True) else '1d20'
+str_one += f'+{ability_one.value}'
+str_one += '+' + bonus_one if args.last('b') else ''
+roll_one = vroll(roll_str)
+# Second Check
+# Third Check
+</drac2>

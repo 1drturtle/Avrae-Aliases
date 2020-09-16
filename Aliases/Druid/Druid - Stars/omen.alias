@@ -1,8 +1,9 @@
 !alias omen embed -title "{{name}} uses their Cosmic Omen Feature!" -thumb <image> -color <color>
 <drac2>
+char=character()
 args=&ARGS&
 cc="Star Map"
-create_cc_nx(cc, 0, wisdomMod, 'long', 'bubble')
+char.create_cc_nx(cc, 0, wisdomMod, 'long', 'bubble')
 omen="1d6"
 odd="-f \"**Woe (odd).**|Whenever a creature you can see within 30 feet of you makes an attack roll, a saving throw, or an ability check, you can use your reaction to roll a d6 and subtract the number rolled from the total.\""
 even="-f \"**Weal (even).**|Whenever a creature you can see within 30 feet of you makes an attack roll, a saving throw, or an ability check, you can use your reaction to roll a d6 and add the number rolled to the total.\""
@@ -10,11 +11,11 @@ R=vroll(omen)
 number = R.total
 rolled=False
 if len(args)>=1 and args[0] in "roll":
-    set_cvar("OmenRoll", R.total)
+    char.set_cvar("OmenRoll", R.total)
     rolled = True
 else:
     number=int(OmenRoll)
-    mod_cc(cc, -1, True)
+    char.mod_cc(cc, -1, True)
 if number%2:
     eo=odd
 else:
@@ -22,4 +23,4 @@ else:
 </drac2>
 {{'-f "Roll|'+str(R)+'"' if rolled else None}}
 {{eo}}
-{{f'-f "Remaining Uses|'+cc_str(cc)+'"' if not rolled else None}}
+{{f'-f "Remaining Uses|'+char.cc_str(cc)+'"' if not rolled else None}}

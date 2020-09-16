@@ -1,5 +1,6 @@
 -title "**Downtime Activity: {{title}}**" -thumb <image> -color <color>
 <drac2>
+ch=character()
 if len(args) < 3: # Checks to make sure there is at least 3 arguments
 	err("Not enough arguments - See `!dttrain-help`")
 t = ["charisma","wisdom","strength","dexterity","intelligence","constitution"] # Defines the skills that can be used to train
@@ -9,14 +10,14 @@ skill=skill[0] # Array -> String
 if not skill:									# If the skill is not set,
 	err("Invalid Skill - See `!dttrain-help`")  # Spit out an error
 
-skill_b = get_raw().skills[skill] # Get the skill bonus for the Skill
+skill_b = ch.skills[skill] if skill in ch.skills else err('Skill bonus not found')# Get the skill bonus for the Skill
 slot_c = "DT Slot" # Sets the name for the DT Slot CC
 train_c = cc # Sets the name for the training CC based on arguments from alias
-create_cc_nx(slot_c, 0, 2, "none", "bubble") # Create DT Slot CC if it doesn't exist
-create_cc_nx(train_c, 0, days, "none", None) # Create Training CC if it doesn't exist
+ch.create_cc_nx(slot_c, 0, 2, "none", "bubble") # Create DT Slot CC if it doesn't exist
+ch.create_cc_nx(train_c, 0, days, "none", None) # Create Training CC if it doesn't exist
 
-if get_cc(train_c) == days: # If the value of the training CC equals the max value,
-	set_cc(train_c, 0)      # Reset the training CC to 0
+if ch.get_cc(train_c) == days: # If the value of the training CC equals the max value,
+	ch.set_cc(train_c, 0)      # Reset the training CC to 0
 	
 pargs = argparse(args[3:]) # Gets any args after the base 3, parses them, and places them into pargs
 mentor = True if pargs.get("mentor") else False # Sets the mentor variable to true if -mentor is passed
@@ -61,7 +62,7 @@ if exists('cost'):
         # Reset coin pouch
         coin_bag_after = ['Coin Pouch', bag]
         bags_before[index] = coin_bag_after
-        set_cvar('bags', dump_json(bags_before))
+        ch.set_cvar('bags', dump_json(bags_before))
     else:
         err('No coin bag found.')
 </drac2>
@@ -82,7 +83,7 @@ else:					# If we don't succed
 		mod_amount -= 1 # Take away one
 		if mentor and mentor_double:			# If there's a mentor
 			mod_amount -= 1 # Take away another point
-mod_cc(train_c, mod_amount) # Modify training CC by amount determined
+ch.mod_cc(train_c, mod_amount) # Modify training CC by amount determined
 
 dt_amount = get('dt', 1)
 </drac2>
@@ -92,10 +93,10 @@ dt_amount = get('dt', 1)
 **Training:** {{args[1]}}
 **Checking:** {{skill.title()}}
 **Rolled:** {{str(R)}}
-Remaining DTD slot: **{{mod_cc("DT Slot", -dt_amount)}}{{cc_str("DT Slot")}}**
+Remaining DTD slot: **{{ch.mod_cc("DT Slot", -dt_amount)}}{{ch.cc_str("DT Slot")}}**
 """
 -f """Result|
 {{"You **passed** the DC "+str(dc)+"!" if success else None}}{{"You **failed** the DC "+str(dc)+"!" if not success else None}}{{"\n**Crit Success!**" if crit_type==1 else None}}{{"\n**Crit Failure!**" if crit_type==2 else None}}
-Training Progress: {{cc_str(train_c)}} ({{"+" if mod_amount>0 else ""}}{{mod_amount}}){{f'\nYou finished training {args[1]}!' if get_cc(train_c)>=days else None}}
+Training Progress: {{ch.cc_str(train_c)}} ({{"+" if mod_amount>0 else ""}}{{mod_amount}}){{f'\nYou finished training {args[1]}!' if ch.get_cc(train_c)>=days else None}}
 """
 {{coin_string}}

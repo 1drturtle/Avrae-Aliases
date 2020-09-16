@@ -1,6 +1,7 @@
 <drac2>
+ch=character()
 # Get highest skill bonus for working
-skill_b=max(get_raw()['skills']['performance'], wisdomMod, intelligenceMod)
+skill_b=max(ch.skills['performance'], wisdomMod, intelligenceMod)
 # Set Base roll string (adv or dis)
 base_roll = "1d20+"
 if pargs.adv() == 1:
@@ -66,7 +67,7 @@ if bags_before is not 0:
     coins_after = coin_bag_before[1]['gp']
     final_string += f'-f "Added Coins to Bag|{coins_before}gp -> {coins_after}gp"'
     bags_before[index] = coin_bag_before
-    set_cvar('bags', dump_json(bags_before))
+    ch.set_cvar('bags', dump_json(bags_before))
 
 return final_string
 </drac2>

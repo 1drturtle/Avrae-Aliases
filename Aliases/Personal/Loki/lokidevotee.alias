@@ -1,11 +1,12 @@
 !alias lokidevotee <drac2>
+ch=character()
 cc="Loki's Devotee"
-cc_v = get_cc(cc)
-if not cc_exists(cc):
+cc_v = ch.get_cc(cc)
+if not ch.cc_exists(cc):
 	return f'echo You do not have a CC called {cc}'
 if cc_v > 0:
-	mod_cc(cc, -1)
-	return f'cast "Disguise Self" -i cha -phrase "using {cc}" -f "{cc}|{cc_str(cc)}"'
+	ch.mod_cc(cc, -1)
+	return f'cast "Disguise Self" -i cha -phrase "using {cc}" -f "{cc}|{ch.cc_str(cc)}"'
 else:
-	return f'tembed -title "{name} tries to cast Disguise Self but cannot." -desc "You must take a long rest before casting this spell" -thumb <image> -color <color> -f "{cc}|{cc_str(cc)}"'
+	return f'tembed -title "{name} tries to cast Disguise Self but cannot." -desc "You must take a long rest before casting this spell" -thumb <image> -color <color> -f "{cc}|{ch.cc_str(cc)}"'
 </drac2>

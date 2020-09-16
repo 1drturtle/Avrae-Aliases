@@ -1,7 +1,8 @@
 !alias jettime embed -title "Remaining Jet Time" -thumb <image> -color <color> <drac2>
+c=character()
 jet_name = "Jet Propulsion"
-create_cc_nx(jet_name, 0, 240)
-jet = get_cc(jet_name)
+c.create_cc_nx(jet_name, 0, 240)
+jet = c.get_cc(jet_name)
 jet_hours = int(jet/60)
 jet_minutes = int(jet%60) if jet_hours > 0 else jet
 jet_hours_plural = '' if jet_hours == 1 else 's'

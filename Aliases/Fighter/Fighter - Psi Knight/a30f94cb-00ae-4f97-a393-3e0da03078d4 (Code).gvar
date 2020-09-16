@@ -1,4 +1,5 @@
 <drac2>
+c=character()
 return_title = ''
 return_desc = ''
 return_fields = ''
@@ -31,10 +32,10 @@ elif psiRL == 0:
     return ''
 elif command == 'reset' or command == 'rest':
     # Command for LR
-    set_cvar_nx('psiDie', f'{dieL}') # Create CVAR if not exist
+    c.set_cvar_nx('psiDie', f'{dieL}') # Create CVAR if not exist
     oldPsi = psiDie # Set oldPsi to psiDie variable before reset
-    set_cvar('psiDie', f'{dieL}') # Reset die
-    set_cvar('MpsiDie', f'{dieL}') # Reset max die
+    c.set_cvar('psiDie', f'{dieL}') # Reset die
+    c.set_cvar('MpsiDie', f'{dieL}') # Reset max die
     return_title = '-title "Psionic Resting"'
     return_desc = '-desc "You take a long rest and regain your psionic energy"'
     return_fields = f'''-f """Display| Soulknife Level - {psiRL}
@@ -44,18 +45,18 @@ elif command == 'reset' or command == 'rest':
                      '''
 elif command == 'replenishment' or command == 'replenish':
     cc = 'Psi Replenishment'
-    create_cc_nx(cc, 0, 1, 'long', 'bubble')
+    c.create_cc_nx(cc, 0, 1, 'long', 'bubble')
     if get_cc(cc) == 0:
         return_title = f'-title "{name} tries to use their {cc} feature!"'
         return_desc = f'-desc "You cannot use this feature until you finish a long rest"'
-        return_fields = f'-f "{cc}|{cc_str(cc)}"'
+        return_fields = f'-f "{cc}|{c.cc_str(cc)}"'
         return ''
-    mod_cc(cc, -1)
+    c.mod_cc(cc, -1)
     return_title = f'-title "{name} uses their {cc} feature!"'
     return_desc = '-desc "As a bonus action, you can calm your mind for a moment and restore your Psionic Talent die to its starting size. You then can\'t use Psi Replenishment again until you finish a long rest."'
     oldPsi = psiDie
-    set_cvar('psiDie', f'{MpsiDie}')
-    return_fields += f'-f """Psi Replenishment| {cc_str(cc)}"""\n'
+    c.set_cvar('psiDie', f'{MpsiDie}')
+    return_fields += f'-f """Psi Replenishment| {c.cc_str(cc)}"""\n'
     return_fields += f'-f """Updated Psionic Talent Die| 1d{oldPsi} -> 1d{psiDie}"""'
 elif command == 'field' or command == 'protective':
     return_title = f'-title "{name} uses their Protective Field feature!"'
@@ -69,8 +70,8 @@ elif command == 'field' or command == 'protective':
     if psi is None:
         err('Your Psionic Talent is currently unusable')
     dice = psi.total - mod
-    set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
-    set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
+    c.set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
+    c.set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
     return_fields += f'-f """Psionic Talent Die Roll| {str(psi)}"""\n'
     return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
 elif command == 'leap':
@@ -88,8 +89,8 @@ elif command == 'leap':
         err('Your Psionic Talent is currently unusable')
     dice = psi.total
     return_fields += f'-f """Psionic Talent Die Roll| (1d{psiDie} ({psi_result})) * 2 + {mod} = `{total}`"""\n'
-    set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
-    set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
+    c.set_cvar('psiDie', f'{psiDown}') if dice == int(psiDie) else None
+    c.set_cvar('psiDie', f'{psiUp}') if dice == 1 else None
     return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
 elif command == 'strike':
     return_title = f'-title "{name} uses their Telekenetic Strike."'
@@ -101,8 +102,8 @@ elif command == 'strike':
     psi = vroll(f'1d{psiDie}')
     if psi is None:
         err('Your Psionic Talent is currently unusable')
-    set_cvar('psiDie', f'{psiDown}') if psi.total == int(psiDie) else None
-    set_cvar('psiDie', f'{psiUp}') if psi.total == 1 else None
+    c.set_cvar('psiDie', f'{psiDown}') if psi.total == int(psiDie) else None
+    c.set_cvar('psiDie', f'{psiUp}') if psi.total == 1 else None
     return_fields += f'-f """Psionic Talent Die Roll| {str(psi)}"""\n'
     return_fields += f'-f """Updated Psionic Talent Die| 1d{psiDie}"""'
 elif command == 'thrust':
@@ -127,7 +128,7 @@ elif command == 'move':
     return_desc = '-desc "If your Psionic Talent die is available, you can move an object or a creature with your mind. As an action, you target one loose object that is Large or smaller or one willing creature, other than yourself. If you can see the target and it is within 30 feet of you, you can move it up to 30 feet to an unoccupied space you can see. Alternatively, if it is a Tiny object, you can move it to or from your hand. Either way, you can move the target horizontally, vertically, or both. When you take this action, your Psionic Talent die decreases by one die size."'
     psiDown=int(psiDie)-2
     psiDown=psiDown if psiDown>=4 else 0
-    set_cvar('psiDie', f'{psiDown}')
+    c.set_cvar('psiDie', f'{psiDown}')
     return_fields = f'-f "Updated Psionic Talent Die| 1d{psiDie}"'
 </drac2>
 {{return_title}}
