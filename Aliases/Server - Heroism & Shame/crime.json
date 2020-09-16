@@ -1,0 +1,20 @@
+{
+	"one": [
+		"You find a lowly commoner/streetrat",
+		"You find an average middleclassed commoner",
+		"You find a rather modest looking individual",
+		"You find a rather wealthy noble or aristocrat"
+	],
+	"two": [
+		"You are instantly spotted and take 1 point of **Heat**",
+		"You manage to stay pretty well hidden and don't catch anyone's eye.",
+		"You stay very well hidden and don't raise any suspicion",
+		"You are an expert at this and now how to slip in and out rather quickly. "
+	],
+	"three": [
+		"You are caught and take 2 points of **Heat**",
+		"You manage to steal something light",
+		"You are able to steal and fairly get away with it",
+		"You stole and perfectly got away with it"
+	],
+}
