@@ -1,0 +1,6 @@
+tembed {{f'''{'{'*2}args=&ARGS&{'}'*2}'''}}
+{{f'''{'{'*2}coinTypes=["cp","sp","ep","gp","pp"]{'}'*2}'''}}
+{{f'''{'{'*2}coinRates={'{'}"cp":100,"sp":10,"ep":2,"gp":1,"pp":0.1{'}'} {'}'*2}'''}}
+{{f'''{'{'*2}defaultCoin="gp"{'}'*2}'''}}
+{{f'''{'{'*2}coinPouchName="Business Funds"{'}'*2}'''}}
+{{get_gvar("912e8eac-adcb-4d29-bcb6-23acc3624211")}}

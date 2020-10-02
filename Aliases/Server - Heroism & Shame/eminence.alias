@@ -1,0 +1,42 @@
+embed -thumb <image> -color <color>
+<drac2>
+cc="Eminence"
+create_cc_nx(cc, 0)
+args=&ARGS&
+tags=load_json(get_gvar("65f32df2-b4b0-4862-9436-dfa07ee1ded2"))
+set_cvar_nx("Tag", tags[0]["name"])
+i=0
+highest = tags[0]["name"]
+for tag in tags:
+    cc_v = get_cc(cc)
+    highest=i if tag["value"] <= cc_v else highest
+    i += 1
+modified = False
+promoted = False
+if len(args) == 1 and int(args[0]) != 0:
+    v=int(args[0])
+    mod_cc(cc, v)
+    pm = "+" if v>0 else ""
+    eminence_string = f'-f "Eminence|{get_cc(cc)} ({pm+str(v)})"'
+    verb = "gains" if v>0 else "looses"
+    eminence_title = f'-title "{name} {verb} {v} point(s) of eminence"'
+    modified = not modified
+else:
+    eminence_title = f'-title "{name} has {get_cc(cc)} point(s) of eminence"'
+    eminence_string = f'-f "Eminence|{get_cc(cc)}"'
+highest_recheck = highest
+ii = 0
+for tag in tags:
+    cc_v = get_cc(cc)
+    highest_recheck=ii if tag["value"] <= cc_v else highest_recheck
+    ii += 1
+tag_string = f'-f "Current Tag|{tags[highest_recheck]["name"]}"'
+if highest != highest_recheck:
+    promoted = True
+    promoted_string = f'-f "Promoted!|You were promoted to {tags[highest_recheck]["name"]}"' if v>0 else f'-f "Demoted|You were demoted to {tags[highest_recheck]["name"]}"'
+set_cvar("Tag", tags[highest_recheck])
+</drac2>
+{{eminence_title}}
+{{eminence_string}}
+{{tag_string}}
+{{promoted_string if promoted else None}}

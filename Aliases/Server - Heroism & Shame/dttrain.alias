@@ -1,7 +1,117 @@
-!alias dttrain tembed 
-{{f'''{'{'*2}args=&ARGS&{'}'*2}'''}}
-{{f'''{'{'*2}dc=10{'}'*2}'''}}
-{{f'''{'{'*2}days=20{'}'*2}'''}}
-{{f'''{'{'*2}cc="Training"{'}'*2}'''}}
-{{f'''{'{'*2}title="Training"{'}'*2}'''}}
-{{get_gvar("9d11e224-99dd-4c60-8a45-953622b548f6")}}
+tembed 
+<drac2>
+# Args
+args=&ARGS&
+dc=10
+days=20
+cc="Training"
+title="Training"
+</drac2>
+-title "**Downtime Activity: {{title}}**" -thumb <image> -color <color>
+<drac2>
+ch = character()
+pargs = argparse(args[3:])
+
+if len(args) < 3: # Checks to make sure there is at least 3 arguments
+    err("Not enough arguments - See `!dttrain-help`")
+
+possible_skills = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+
+skill_name=[skill_name for skill_name in possible_skills if args[2].lower() in skill_name.lower()]
+skill_name=skill_name[0] if len(skill_name) > 0 else err("Invalid Skill - See `!dttrain-help`")
+
+skill_b = ch.skills[skill_name] # Get the skill bonus for the Skill
+slot_c = "DT Slot" # Sets the name for the DT Slot CC
+train_c = cc # Sets the name for the training CC based on arguments from alias
+ch.create_cc_nx(slot_c, 0, 2, "none", "bubble") # Create DT Slot CC if it doesn't exist
+ch.create_cc_nx(train_c, 0, days, "none", None) # Create Training CC if it doesn't exist
+</drac2>
+<drac2>
+# Check to see if previously finished
+if ch.get_cc(train_c) == days: # If the value of the training CC equals the max value,
+    ch.set_cc(train_c, 0)      # Reset the training CC to 0
+# Get Adv/Dis/Bonus/Mentor, setup roll_str
+bonus_string = pargs.join('b', '+')
+adv = pargs.get('adv')
+
+roll_str = '1d20'
+
+mentor = pargs.get('mentor')
+if mentor or adv == 1:
+    roll_str = '2d20kh1'
+elif adv == -1:
+    roll_str = '2d20kl1'
+
+roll_str += f'+{skill_b.value}'
+
+if bonus_string:
+	roll_str += f'+{bonus_string}'
+
+</drac2>
+<drac2>
+# Take away money (if applicable)
+coin_string = ''
+if exists('cost'):
+    plat_cost = int(cost/10)
+    # Add coins to bag
+    bags_before = load_json(get('bags', 0))
+    if bags_before is not 0:
+        coin_bag_before = [bag for bag in bags_before if bag[0] == 'Coin Pouch'][0]
+        index = bags_before.index(coin_bag_before)
+        bag = coin_bag_before[1]
+        # Check for Platnium first
+        if bag.pp >= plat_cost:
+            plat_before = bag.pp
+            bag['pp'] -= plat_cost
+            plat_after = bag.pp
+            coin_string = f'-f "Removed Coins|{plat_before} pp -> {plat_after} pp"'
+        # Then, check for gold
+        elif bag.gp >= cost:
+            gold_before = bag.gp
+            bag['gp'] -= cost
+            gold_after = bag.gp
+            coin_string = f'-f "Removed Coins|{gold_before} gp -> {gold_after} gp"'
+        else:
+            err("Not enough funds to do this training!")
+        # Reset coin pouch
+        coin_bag_after = ['Coin Pouch', bag]
+        bags_before[index] = coin_bag_after
+        ch.set_cvar('bags', dump_json(bags_before))
+    else:
+        err('No coin bag found.')
+</drac2>
+<drac2>
+# Success/Fail
+R = vroll(roll_str)
+crit_type = int(R.result.crit)
+success = True if R.total >= dc else False # Check to see if we passed
+mod_amount = 0 # Init mod amount
+mentor_double = get('mentor_test', True)
+if success:				# If we succeded:
+	mod_amount += 1		# Add +1 Training days
+	if crit_type == 1:  # If it's a crit
+		mod_amount += 1 # Add another day
+	if mentor and mentor_double:
+		mod_amount *= 2 # If there's a mentor than double the progress of the day
+else:					# If we don't succed
+	if crit_type == 2:  # 	If it's a crit fail
+		mod_amount -= 1 # Take away one
+		if mentor and mentor_double:			# If there's a mentor
+			mod_amount -= 1 # Take away another point
+ch.mod_cc(train_c, mod_amount) # Modify training CC by amount determined
+
+dt_amount = get('dt', 1)
+</drac2>
+-desc """
+**Character:** {{name}}{{f'\n**Mentor:** {pargs.get("mentor")[0]}' if mentor else None}}
+**Date:** {{args[0]}}
+**Training:** {{args[1]}}
+**Checking:** {{skill_name.title()}}
+**Rolled:** {{str(R)}}
+Remaining DTD slot: **{{aaa=ch.mod_cc("DT Slot", -dt_amount)}}{{ch.cc_str("DT Slot")}}**
+"""
+-f """Result|
+{{"You **passed** the DC "+str(dc)+"!" if success else None}}{{"You **failed** the DC "+str(dc)+"!" if not success else None}}{{"\n**Crit Success!**" if crit_type==1 else None}}{{"\n**Crit Failure!**" if crit_type==2 else None}}
+Training Progress: {{ch.cc_str(train_c)}} ({{"+" if mod_amount>0 else ""}}{{mod_amount}}){{f'\nYou finished training {args[1]}!' if ch.get_cc(train_c)>=days else None}}
+"""
+{{coin_string}}
