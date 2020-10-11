@@ -1,0 +1,45 @@
+tembed -title "{{name}} casts Thaumarugy" -thumb "https://cdn.discordapp.com/attachments/736439805436755998/754568553310716054/Hermetic_circle.jpg" -footer "!thaumaturgy [voice] [flame] [tremor] [sound] [open] [eyes] [reset]"
+{{pargs=&ARGS&}}}}
+<drac2>
+pargs=argparse(pargs)
+ccname = "Thaumaturgy"
+hasspell = False
+returnstr = f'-f \"You manifest a minor wonder, a sign of supernatural power, within range. You create one magical effects within range\"\n'
+spelllist = get_raw().spellbook.spells
+for spell in spelllist:
+  if spell.name == "Thaumaturgy":
+    hasspell = True
+    create_cc_nx(ccname, "0", "3", "short","bubble")
+if hasspell == True:
+  if pargs.get("voice"):
+    returnstr += f'-f \"Your voice booms up to three times as loud as normal for 1 minute.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("flame"):
+    returnstr += f'-f \"You cause flames to flicker, brighten, dim, or change color for 1 minute.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("tremor"):
+    returnstr += f'-f \"You cause harmless tremors in the ground for 1 minute.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("sound"):
+    returnstr += f'-f \"You create an instantaneous sound that originates from a point of your choice within range, such as a rumble of thunder, the cry of a raven, or ominous whispers.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("open"):
+    returnstr += f'-f \"You instantaneously cause an unlocked door or window to fly open or slam shut.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("eyes"):
+    returnstr += f'-f \"You alter the appearance of your eyes for 1 minute.\"\n'
+    mod_cc(ccname, -1)
+  elif pargs.get("reset"):
+    returnstr += f'-f \"You have reset your Thaumaturgy uses\"\n' 
+    set_cc(ccname, 3)
+  else:
+    returnstr += f'-f \"Use `voice` , `flame` , `tremor` , `sound` , `open` , `eyes`\"\n'
+  if get_cc(ccname) == 0:
+    returnstr += f'-f \"You have no more uses of Thaumaturgy. use the `reset` option to clear uses\"\n' 
+  counter = cc_str(ccname)
+  returnstr += f'-f \"Uses Left: {cc_str(ccname)} \"' 
+  return returnstr
+else:
+  returnstr += f'-f \"You DO NOT have Thaumaturgy cantrip. tsk tsk.\"'
+  return returnstr
+</drac2>

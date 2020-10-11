@@ -1,0 +1,31 @@
+multiline {{p=&ARGS&}}
+<drac2>
+a,p,l,c,d=argparse(p[2:]),argparse(p),"&2&",character(),"Spirit Totem"
+b,h,u="b7b42","vk597","zqj5u"
+em,sp,hl=f'!tembed -title "{name} uses {d} Feature" ',"&1&".capitalize(),f' -f "Help|Usage **only in combat** is `!spirit [bear,hawk,unicorn] [XY] [targets]` for example `!spirit bear a5 co1 co2` will place bear spirit in `!map` A5 and THP CO1 and CO1"'
+ib,ih,iu,il,=p.get("bear"),p.get("hawk"),p.get("unicorn"),len(l)<3
+tk=b if ib else h if ih else u
+en=get_gvar("cc4e3703-73e8-41e4-a615-91371358ff7b").split("^")
+if c.get_cc(d) < 1:
+  return em+" -f \"You must rest first\""
+if combat():
+  rs = f'\n!i opt "{name}" -group "{name} Totem"\n!i add 0 "{sp} Spirit" -group "{name} Totem" -note "Location: {l} | Token: {tk} | Overlay: c30w{{targ}}"\n'
+  if sp == "Bear" and il:
+    for a in a:
+      rs += f'!i thp {a} {5+int(DruidLevel)}\n'
+    em+=en[0].replace('{sp}',sp)
+    c.mod_cc(d,-1)
+  elif sp == "Hawk" and il:
+    em+=en[1].replace('{sp}',sp)
+    c.mod_cc(d,-1)
+  elif sp == "Unicorn" and il:
+    em+=en[2].replace('{sp}',sp)
+    c.mod_cc(d,-1)
+  else:
+    rs = f''
+    return em+hl+eem
+else: 
+  return em+hl+eem
+eem=f' -f "{d}|{c.cc_str(d)} -1"'
+return rs+em+eem
+</drac2>
