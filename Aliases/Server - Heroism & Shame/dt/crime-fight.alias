@@ -6,7 +6,7 @@ pargs=argparse(pargs)
 returnstr, me, repeat, defroll, advroll, pas, fail, emgain, em= "", character(), int(pargs.get("rr")[0]) if pargs.get("rr") else 1, "1d20", "2d20kh1", "*PASS*", "*FAIL*", 0, "Eminence"
 mesk, sadv, cadv, dadv = character().skills, True if pargs.get("sadv") else False, True if pargs.get("cadv") else False, True if pargs.get("dadv") else False
 meint, mestr, medex, mechar, mewis, mepers, meste, medec, meath, meinv, meperc= mesk.intelligence.value, mesk.strength.value, mesk.dexterity.value, mesk.charisma.value, mesk.wisdom.value, mesk.persuasion.value, mesk.stealth.value, mesk.deception.value, mesk.athletics.value, mesk.investigation.value, mesk.perception.value
-scoutb = "+"+str(max(meinv,meperc))
+scoutb, sb = "+"+str(max(meinv,meperc)), pargs.get("sb")[0] if pargs.get("sb") else 0
 sd, si, sw = meste, ((meste-medex)+meint), ((meste-medex)+mewis)
 covertb = "+"+str(max(sd,si,sw))
 atst, atde, pech, dech, pewi, dewi, pein, dein = meath, ((meath-mestr)+medex), mepers, medec, ((mepers-mechar)+mewis), ((medec-mechar)+mewis), ((mepers-mechar)+meint), ((medec-mechar)+meint)
@@ -18,7 +18,7 @@ if exists("Tag"):
 else:
   return f' -f "You are **NOT** a Tag, shoo, get outta here."'
 for i in range(repeat):
-  scoutroll, covertroll, detainroll = vroll(advroll+scoutb) if sadv else vroll(defroll+scoutb), vroll(advroll+covertb) if cadv else vroll(defroll+covertb), vroll(advroll+detainb) if dadv else vroll(defroll+detainb)
+  scoutroll, covertroll, detainroll = vroll(advroll+scoutb) if sadv else vroll(defroll+scoutb), vroll(advroll+covertb+sb) if cadv else vroll(defroll+covertb+sb), vroll(advroll+detainb) if dadv else vroll(defroll+detainb)
   scoutPass, scoutadd, covertPass, detainPass = True if scoutroll.total >= 15 else False, True if scoutroll.total >= 20 else False, True if covertroll.total >= 20 else False, True if detainroll.total >= 20 else False
   oneEm = True if scoutPass and covertPass and detainPass else False
   twoEm = True if scoutadd and covertPass and detainPass else False
