@@ -1,0 +1,3 @@
+embed -title "Resetting DT for {{name}}"
+{{set_cc("DT Slot", 2)}}
+-desc "{{cc_str('DT Slot')}}" -thumb <image> -color <color>
