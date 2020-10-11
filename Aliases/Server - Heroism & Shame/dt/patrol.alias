@@ -27,5 +27,5 @@ Requires 1 downtime and to be a copper tag
 An arrest gives you Eminence, and eminence is how recognized and famous you are to the town hall and Sacredcrest Headquarters. The more eminence you get the more likely you are to get promoted
 """
 -f "Patrol|{{str(patrol)}}"
--f "DT Slot|{{ch.cc_str(dtcc)}} {{'(-1)' if dt else '(-0)'}}"
+-f "DT Slot|{{ch.cc_str(dtcc)}}{{' (-1)' if dt else ''}}"
 -thumb <image> -color <color>

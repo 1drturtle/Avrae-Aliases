@@ -1,0 +1,39 @@
+embed -title "Criminal Downtime"
+<drac2>
+# Only a reference alias
+# Written by Mion (Ithala#3408)
+</drac2>
+-f """__*Takes 2 Downtime Slots*__
+*Some take to the shadows and crowds to earn their gold. A much more dangerous method, but one for those with little to lose.*"""
+-f """Intel Check|*Investigation* `!c invest` *or Perception check* `!c pers`
+9 or lower: Commoner/Streetrat
+10-14: Moderate Commoner
+15-20: Modest Individual
+21 and higher: Wealthy Noble"""
+-f """Blending In Check|*Stealth* `!c stealth` *or Disguise Kit check* `!tool disguise dex`
+9 or lower: Spotted - Take 1 Heat `!heat 1`
+10-14: Well Hidden
+15-20: Very Well Hidden
+21 and higher: Expert"""
+-f """Pickpocketing Check|*Sleight of Hand* `!c sleight` *or Performance check* `!c perf`
+9 or lower: Caught- Take 2 Heat `!heat 2`- Earn no gold
+10-14: Something light - Earn 50% gold `\*.5`
+15-20: Decent amount - Earn 75% gold `\*.75`
+21 and higher: Perfect - Earn all gold"""
+-f"""Earnings Table|
+Roll the dice based on Intel Check. Remove from total based on Pickpocketing Check.
+
+Poor Street Rat: 1 gp+1d4 `!r 1+1d4`
+Moderate: 10 gp+1d6 `!r 10+1d6`
+Modest: 30 gp +1d8 `!r 30+1d8`
+Wealthy Noble: 10 pp+1d10 gp `!r 100+1d10`"""
+-f """Every successful crime rewards Cred `!cred 1`
+
+*Example: Bolt searches for a mark in Orovion with Alakazam's help.*
+`!c perception adv` - Modest target
+`!c stealth adv` - Well hidden
+`!c sleight adv` - Half earnings
+`!r (30+1d8)/2`
+`!cred 1`"""
+-image https://cdn.discordapp.com/attachments/674772008935882772/763776715477876766/f05b61d7377be70a8615919587ef859e.jpg
+-color 808080

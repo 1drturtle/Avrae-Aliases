@@ -1,0 +1,86 @@
+tembed -title "Downtime: Community Service" -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
+<drac2>
+# Written By: MrRobinhood5#1999
+calendar=load_json(get_gvar("1aec09a0-9e25-4700-9c2d-42d79cb0163b"))
+hourOffset=calendar.get('hourOffset',0)+int(get('timezone',0))
+baseYear=calendar.get("yearOffset",1970)
+Time=time()+(3600*hourOffset)
+totalDayCount=int((Time)//86400)
+yearsPassed=totalDayCount//calendar.length
+numLeapYears=len([x for x in range(baseYear,baseYear+yearsPassed-4) if x//calendar.get('leapCycle',4)==x/calendar.get('leapCycle',4)]) if calendar.get('leapCycle') else 0
+yearStartDay=yearsPassed*calendar.length+numLeapYears
+totalDays=totalDayCount-yearStartDay
+year=int((totalDayCount-numLeapYears-1)//calendar.length)+baseYear
+isLeapYear=year//calendar.get('leapCycle',4)==year/calendar.get('leapCycle',4) if numLeapYears else 0
+calendarDay=totalDays%(calendar.length+isLeapYear) or calendar.length+isLeapYear
+hour=int(Time%86400//3600)
+minute=int(Time%86400%3600//60)
+second=int(Time%86400%3600%60)
+monthLengths=[x.length+(isLeapYear and x.name==calendar.get('leapMonth','February')) for x in calendar.months]
+day,month=calendarDay,1
+[(day:=day-monthLengths[x],month:=month+1) for x in range(len(monthLengths)) if month>x and day>monthLengths[x]]
+#timestamp=f'{month:02}/{day:02}/{str(year)[2:]} ({hour:02}:{minute:02}:{second:02})'
+timestamp=f'{month:02}.{day:02}.{str(year)[2:]}'
+</drac2>
+<drac2>
+pargs=argparse(pargs)
+h, cp, ph, me, avgroll, avgresult,e, = "Heat", "Community Points", "pHeat", character(),0,"","Eminence"
+if pargs.get("rr"):
+  repeat = 2 if int(pargs.get("rr")[0]) >= 2 else 1
+else:
+  repeat = 1
+returnstr = f' -desc "Using {repeat} Downtime for {timestamp}" \n -f "Stats| '
+if exists("Tag"):
+  isTag = True
+  tagInfo = load_json(Tag)
+  returnstr += f'You are a {tagInfo["name"]}, '
+else:
+  isTag = False
+me.create_cc_nx(cp,0)
+me.create_cc_nx(h, 0)
+if pargs.get("heat"):
+  if me.get_cc(cp) >= 20 and me.get_cc(h) > 0:
+    me.mod_cc(cp,-20)
+    me.mod_cc(h,-1)
+    return f' -f "You have traded `20` Community Points for `-1` Heat. Thank you for your Service\n Current Community Points:`{me.get_cc(cp)}` (-20), Heat `{me.get_cc(h)}` (-2)"'
+  else:
+    return f' -f "You **Do NOT** have enough Community Points or any Heat for this transaction."'
+if pargs.get("eminence"):
+  if isTag and me.get_cc(cp) >= 20:
+    me.mod_cc(cp,-20)
+    me.mod_cc(e,+1)
+    return f' -f "You have traded `20` Community Points for `1` Eminence. Thank you for your Service\n Current Community Points:`{me.get_cc(cp)}` (-20), Heat `{me.get_cc(e)}` (+1)"'
+  else:
+    return f' -f "You **Do NOT** have enough Community Points or you are not a Tag. (Have you ran `!eminence` ?)"'
+returnstr += f'have `{me.get_cc(cp)}` Community Points, '
+hasHeat = False if not cc_exists(h) else False if me.get_cc(h) == 0 else True
+if hasHeat and not exists(ph) or hasHeat and me.get_cc(h) < int(pHeat):
+  character().set_cvar(ph, me.get_cc(h))
+returnstr += f'have `{me.get_cc(h)}` Heat, ' if hasHeat else f''
+gotHeat = True if hasHeat and character().get_cc(h) > int(pHeat) else False
+returnstr += f'but gained Heat! Community Points reset to `0`, ' if gotHeat else f''
+me.set_cc(cp, 0) if gotHeat else 0
+me.set_cvar(ph, me.get_cc(h))
+if hasHeat and me.get_cc(h) >= 5:
+  return f' -f "WARNING|You **CANNOT** do Community Service with more than 5 Heat. Bye"'
+returnstr += f'nice."\n '
+roll1mod = str((me.skills.performance.value-me.skills.charisma.value)+me.skills.constitution.value)
+roll2mod = str((me.skills.athletics.value-me.skills.strength.value)+me.skills.dexterity.value)
+for i in range(repeat):
+  perfroll = vroll("1d20+"+roll1mod)
+  athroll = vroll("1d20+"+roll2mod)
+  returnstr += f' -f "Roll {i+1}|**Performance**: {perfroll.full}\n**Athletics**: {athroll.full}\n'
+  avgroll = floor(perfroll.total + athroll.total)/2
+  if avgroll > 20:
+    me.mod_cc(cp, +2)
+    returnstr += f'**Result:** Outstanding work. Community Points: `{me.get_cc(cp)}` (+2)|inline"\n'
+  elif avgroll >= 15:
+    me.mod_cc(cp, +1)
+    returnstr += f'**Result:** Excellent Work. Community Points: `{me.get_cc(cp)}` (+1)|inline"\n'
+  elif avgroll >= 10:
+    returnstr += f'**Result:** Good Job. Keep it up|inline"\n'
+  else:
+    returnstr += f'**Result:** You done messed up. Go home. Come back tomorrow|inline"\n'
+    return returnstr
+return returnstr
+</drac2>

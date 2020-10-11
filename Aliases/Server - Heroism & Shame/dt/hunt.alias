@@ -1,0 +1,107 @@
+tembed -title """{{name}}: Hunting Downtime""" -thumb <image> -color <color>
+-footer """!help dt hunt | v4.0 by mrrobinhood5#1999 """
+{{pargs=&ARGS&}}
+<drac2>
+
+# written by: mrrobinhood5#1999
+
+pargs=argparse(pargs) 
+firstrollstr = "2d20kh1+" if pargs.get("fav") else "1d20+"
+secondrollstr = "2d20kh1+" if pargs.get("inv") or pargs.get("ginv") or pargs.get("trap") else "1d20+"
+pwot = "+10" if pargs.get("pwot") else ""
+thirdrollstr = "2d20kh1+" if pargs.get("adv") else "1d20+"
+attackb = pargs.get("b") if pargs.get("b") else "0"
+repeat = int(pargs.get("rr")[0]) if pargs.get("rr") else 1
+
+mainstringy = []
+if get_raw().skills["perception"] > get_raw().skills["investigation"]:
+    searchbonus = get_raw().skills["perception"]
+    firstskill = "Perception"
+else:
+    searchbonus = get_raw().skills["investigation"]
+    firstskill = "Investigation"
+
+for i in range(repeat):
+    current = {} 
+    current['searchroll'] = vroll(firstrollstr+str(searchbonus))
+    if current['searchroll'].total < 15:
+        current['beast']='Could not locate any prey'
+        current['CR']='0'
+        current['size'] = ''
+    else:
+        current['size'] = 'Large' if current['searchroll'].total >= 20 else 'Medium'
+        beasts = load_json(get_gvar('b2186794-8fc7-46b3-a237-1c78d48a5494')) if current ['searchroll'].total >= 20 else \
+            load_json(get_gvar('3f0f4d76-efd5-4190-9520-8e707b288053'))
+        num = len(beasts)
+        randnum = vroll(f'1d{num}-1')
+        current['beast'] = beasts[randnum.total]['name']
+        current['CR'] = beasts[randnum.total]['cr']
+    if current['searchroll'].total < 15:
+        secondMod = 0
+        current['secondability'] = ''
+    secondMod=0
+    if get_raw().stats["wisdomMod"] >= get_raw().stats["intelligenceMod"] and get_raw().stats["wisdomMod"] >= get_raw().stats["dexterityMod"]:
+            current['secondability'] = 'Wisdom'
+            secondMod = get_raw().stats["wisdomMod"]
+    elif get_raw().stats["dexterityMod"] >= get_raw().stats["wisdomMod"] and get_raw().stats["dexterityMod"] >= get_raw().stats["intelligenceMod"]:
+            current['secondability'] = 'Dexterity'
+            secondMod = get_raw().stats["dexterityMod"]
+    else:
+        current['secondability'] = 'Intelligence'
+        secondMod = get_raw().stats["intelligenceMod"]
+    cammobonus = (get_raw().skills["stealth"] - get_raw().stats["dexterityMod"]) + secondMod
+    current['cammoroll'] = vroll(secondrollstr+str(cammobonus)+str(pwot))
+    current['cammo'] = 'No beasts to sneak up on' if current['searchroll'].total < 15 else 'You scared off the beast' if current['cammoroll'].total < 20 else 'You successfully snuck up.'
+    if current['searchroll'].total < 15 or current['cammoroll'].total < 20:
+        current['killshot'] = 'nothing to kill'
+        current['thirdrollstr1'] = '0'
+        current['thirdrollstr2'] = '0'
+        current['thirdability'] = 'nothing to kill'
+    else:
+        current['thirdability'] = 'Melee' if get_raw().stats["strengthMod"] >= get_raw().stats["dexterityMod"] else 'Ranged'
+        thirdbonus = str(max(get_raw().stats["strengthMod"], get_raw().stats["dexterityMod"])+get_raw().stats["proficiencyBonus"]) if attackb == '0' else attackb[0]
+        current['thirdrollstr1'] = vroll(thirdrollstr+thirdbonus)
+        current['thirdrollstr2'] = vroll(thirdrollstr+thirdbonus)
+        if current['size'] == 'Medium' and current['thirdrollstr1'].total >= 15 and current['thirdrollstr2'].total >= 15:
+            current['killshot'] = 'Beast is killed'
+        elif current['size']=='Large' and current['thirdrollstr1'].total >= 20 and current['thirdrollstr2'].total >= 20:
+            current['killshot'] = 'Beast is killed'
+        else:
+            current['killshot'] = 'You failed to kill'
+    lootrollstr = '1d20+'
+    lootbonus = max(get_raw().skills['survival'],get_raw().skills['nature'])
+    current['lootability'] = 'Survival' if get_raw().skills['survival'] > get_raw().skills['nature'] else 'nature'
+    current['lootroll'] = vroll(lootrollstr+str(lootbonus))
+    if current['lootroll'].total >= 15:
+        current['lootstr'] = 'Extracted 2 beast parts'
+    elif current['lootroll'].total >= 20:
+        current['lootstr'] = 'Extracted 3 beast parts'
+    else:
+        current['lootstr'] = 'Could not extract parts'
+    if current['killshot'] == 'Beast is killed' and current['size'] == 'Medium':
+        current['gold'] = 35
+    elif current['killshot'] == 'Beast is killed' and current['size'] == 'Large':
+        current['gold'] = 50
+    else:
+        current['gold'] = 0
+    mainstringy.append(current)
+totalgp=0
+for i in range(len(mainstringy)):
+    totalgp += mainstringy[i].gold
+coinsLoaded=load_json(bags)
+pouch=([x for x in coinsLoaded if x[0]=="Coin Pouch"])[0]
+oldgp = pouch[1]['gp']
+pouch[1].update({'gp':pouch[1]['gp']+floor(totalgp)})
+pouch in coinsLoaded or coinsLoaded.append(pouch)
+newgp=pouch[1]['gp']
+set_cvar("bags",dump_json(coinsLoaded))
+finalrollstr=''
+for i in range(len(mainstringy)):
+    finalrollstr += f'-f "Attempt#{i+1}" \n'
+    finalrollstr += f'-f "**Scouting** |*{firstskill}*\n{mainstringy[i].searchroll}\nBeast: {mainstringy[i].beast}\nCR: {mainstringy[i].CR}|inline"\n'
+    finalrollstr += f'-f "**Camouflage**| *Stealth({mainstringy[i].secondability})*\n{mainstringy[i].cammoroll}\n{mainstringy[i].cammo}|inline"\n' if mainstringy[i].searchroll.total >= 15 else '-'
+    finalrollstr += f'-f "**Killshot**|*{mainstringy[i].thirdability}*\n{mainstringy[i].thirdrollstr1}\n{mainstringy[i].thirdrollstr2}\n{mainstringy[i].killshot}|inline"\n' if mainstringy[i].cammoroll.total >= 20 and mainstringy[i].searchroll.total >= 15 else '-'
+    finalrollstr += f'-f "**Loot**|*{mainstringy[i].lootability}*\n{mainstringy[i].lootroll}\n{mainstringy[i].lootstr}\n|inline"\n' if mainstringy[i].killshot == 'Beast is killed' else '-'
+finalrollstr += f'-f "Coins|`{str(oldgp)}` => `{str(newgp)}` gp"'
+return finalrollstr
+</drac2>
