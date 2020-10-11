@@ -1,0 +1,11 @@
+embed -title "Resetting DT for {{name}}"
+<drac2>
+ch=character()
+dtcc = "DT Slot"
+created = ch.cc_exists(dtcc)
+ch.create_cc_nx(dtcc, 0, 2, 'none', 'bubble')
+old, new = ch.get_cc(dtcc), ch.set_cc(dtcc, 2)
+return f'-f "Created CC {dtcc}|{ch.get_cc(dtcc)}"' if created else ''
+</drac2>
+-f "{{f'{dtcc}|{ch.get_cc(dtcc)} ({(new - old):+})'}}"
+-thumb <image> -color <color>
