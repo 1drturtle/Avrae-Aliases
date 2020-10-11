@@ -34,7 +34,7 @@ tag_string = f'-f "Current Tag|{tags[highest_recheck]["name"]}"'
 if highest != highest_recheck:
     promoted = True
     promoted_string = f'-f "Promoted!|You were promoted to {tags[highest_recheck]["name"]}"' if v>0 else f'-f "Demoted|You were demoted to {tags[highest_recheck]["name"]}"'
-set_cvar("Tag", tags[highest_recheck])
+set_cvar("Tag", dump_json(tags[highest_recheck]))
 </drac2>
 {{eminence_title}}
 {{eminence_string}}
