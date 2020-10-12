@@ -1,0 +1,37 @@
+embed <drac2>
+# Customization from SVAR
+# SVAR should be dict called  containing
+# {
+# 	"gvar": '...',
+# 	"rankUp": 'Promoted',
+# 	"rankDown": 'Demoted',
+# 	"cvarName": 'GenericRank',
+# 	"ccName": 'Genereic Points',
+# }
+# GVAR should be GVAR ID of JSON
+# JSON should be a list of dictionaries, each dictonary should at least contain a name and value
+err_str = ' not found in Server Config. Contact a Dragonspeaker.'
+config = load_json(get_svar('REPLACE_ME', '{}'))
+ranksGvar = load_json(get_gvar(config.get('gvar', err('GVAR'+err_str))))
+rankUp = config.get('rankUp', err('Rank Up'+err_str))
+rankDown = config.get('rankDown', err('Rank Down'+err_str))
+cvarName = config.get('cvarName', err('Cvar Name'+err_str))
+ccName = config.get('ccName', err('CC Name'+err_str))
+event = config.get('eventName', err('Event Name'+err_str))
+</drac2>
+<drac2>
+output = ''
+# Actual Code
+create_cc_nx(ccName, 0)
+oldCvar = get(cvarName, None)
+# First, parse input
+args = &ARGS&
+# Add/Remove Points
+if len(args):
+	if not args[0].isdigit():
+		return err('Invalid input. Please enter a valid number.')
+# Get Status
+if not len(args):
+	pass
+</drac2>
+-thumb <image> -color <color>
