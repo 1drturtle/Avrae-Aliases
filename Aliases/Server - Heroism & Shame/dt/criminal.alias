@@ -76,7 +76,7 @@ for i in range(repeat):
   #coins calculations for this attempt
   coinearn = earnroll.total * (earnmod)
   coincount += coinearn
-  returnstr += f'- Earnings: {earnroll.full} - bonus x {str(earnmod*100)}% = `{coinearn}`\n' if successCrime else f''
+  returnstr += f'- Earnings: {earnroll.full} x {str(earnmod*100)}% = `{coinearn}`\n' if successCrime else f''
   returnstr += f'- Street Cred: `1`' if successCrime else f''
   returnstr += f'"\n'
 # adds all the coins and puts in the good ol coin pouch
