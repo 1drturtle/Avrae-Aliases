@@ -1,0 +1,4 @@
+embed <drac2>
+args=argparse(&ARGS&)
+feats_gvar = get_svar('featsGvar')
+</drac2>
