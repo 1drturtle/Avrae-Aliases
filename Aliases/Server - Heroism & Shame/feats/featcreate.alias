@@ -17,7 +17,7 @@ feat_embed = {
 			}
 if len(feat_embed.desc) > 2000:
 	return (embed_error + f'-desc "Description longer than 2000 characters. See `{ctx.prefix}help feats create"')
-for field in args.get('field', default=[]):
+for field in args.get('f', default=[]):
 	if len(field) > 1024:
 		return (embed_error + f'-desc "Field longer than 1024 characters. See `{ctx.prefix}help feats create"')
 	feat_embed.fields.append(field)
