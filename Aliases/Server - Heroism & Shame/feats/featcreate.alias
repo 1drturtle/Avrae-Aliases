@@ -1,10 +1,10 @@
 <drac2>
 args=argparse(&ARGS&)
 feats_gvar = get_svar('featsGvar')
-embed_error = f'embed -title "Creation Error!" -thumb {image} -color {color} -footer "{ctx.prefix}help feats create"'
+embed_error = f'embed -title "Creation Error!" -thumb {image} -color {color} -footer "{ctx.prefix}help feats create" '
 if feats_gvar is None:
-	return embed_error + f'-desc "Feat Lookup not setup correctly. See `{ctx.prefix}help feats create`"'
-feat_name = args.get('name')
+	return (embed_error + f'-desc "Feat Lookup not setup correctly. See `{ctx.prefix}help feats create`"')
+feat_name = args.last('name')
 if feat_name == True or feat_name is None:
 	return embed_error + f'-desc "Invalid name provided. See `{ctx.prefix}help feats create`"'
 feat_embed = {
@@ -15,11 +15,11 @@ feat_embed = {
 				'thumb': args.last('thumb', ''),
 				'image': args.last('image', '')
 			}
-if len(feat_embed.desc > 2000):
-	return embed_error + f'-desc "Description longer than 2000 characters. See `{ctx.prefix}help feats create"'
+if len(feat_embed.desc) > 2000:
+	return (embed_error + f'-desc "Description longer than 2000 characters. See `{ctx.prefix}help feats create"')
 for field in args.get('field', default=[]):
 	if len(field) > 1024:
-		return embed_error + f'-desc "Field longer than 1024 characters. See `{ctx.prefix}help feats create"'
+		return (embed_error + f'-desc "Field longer than 1024 characters. See `{ctx.prefix}help feats create"')
 	feat_embed.fields.append(field)
 previous_data = load_json(get_gvar(feats_gvar))
 previous_data[feat_name] = feat_embed
