@@ -1,0 +1,24 @@
+embed <drac2>
+DC = 15
+cc = 'Lingering Injury'
+
+ch = character()
+ch.create_cc_nx(cc, 0, 7, None, 'bubble')
+
+con_save = ch.saves.get('con')
+args = argparse(&ARGS&)
+roll_str = ['1d20', '2d20kh1', '2d20kl1'][args.adv()]
+roll_str += f'+{con_save.value}'
+roll_str += ('+'+args.join('b', '+') if args.get('b') else '')
+save = vroll(roll_str)
+passed = save.total >= 15
+if passed:
+	ch.mod_cc(cc, -1)
+</drac2>
+-title "<name> recovers from an injury"
+-desc "Some times after going on adventures you either dont have the funds to be fixed by the temple or some injuries are beyond their knowledge."
+-f "Constituion Save (DC {{DC}})|{{str(save)}}"
+-f "Result|You {{'passed' if passed else 'failed'}} the DC 15 constituion save."
+-f "Lingering Injury|{{ch.cc_str(cc)}}{{' (-1)' if passed else ''}}"
+-thumb <image> -color <color>
+-footer "!dt pitfight rest | Dr Turtle#1771"
