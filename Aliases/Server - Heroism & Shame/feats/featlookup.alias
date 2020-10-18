@@ -1,0 +1,26 @@
+embed <drac2>
+args=argparse(&ARGS&)
+
+feats_gvar = get_svar('featsGvar')
+embed_error = f'-title "Lookup Error!" -thumb {image} -color {color} -footer "{ctx.prefix}help feats"'
+if feats_gvar is None:
+	return embed_error + f'-desc "Feat Lookup not setup correctly. See `{ctx.prefix}help feats`"'
+feats = load_json(get_gvar(feats_gvar))
+
+args = &ARGS&
+lookup = "&1&" if ("&1" + "&") != "&1&" else ''
+
+if lookup:
+	feat_raw = ([(name, feat) for name, feat in feats.items() if lookup.lower() in name.lower()] + [None])[0]
+	if feat_raw is None:
+		return embed_error + '-desc "Feat not found."'
+	name, feat = feat_raw
+	field_string = ' '.join([f'-f "{field}"' for field in feat.fields])
+	feat_thumb = feat.thumb if feat.thumb != '' else image
+	feat_color = feat.color if feat.color != '' else color
+	feat_string = f'-title "{feat.title}" -desc "{feat.desc}" {field_string} -thumb "{feat_thumb}" -color "{feat_color}" -image "{feat.image}"'
+	return feat_string + ' -footer "!help feats | Dr Turtle#1771"'
+else:
+	feat_list = '\n'.join([f':white_medium_small_square: {name}' for name, feat in feats.items()])
+	return f'-desc "**List of Feats**\n{feat_list}"' + f' -thumb {image} -color {color}'
+</drac2>
