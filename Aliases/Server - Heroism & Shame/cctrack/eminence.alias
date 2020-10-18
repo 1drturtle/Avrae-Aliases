@@ -48,7 +48,7 @@ if level_change:
     if ranksGvar.index(new_cvar) > ranksGvar.index(oldCvar):
         output += f"""-f "{rankUp}|You have been {rankUp} to {current_cvar.name}"\n"""
     # Demoted
-    else:
+    elif ranksGvar.index(new_cvar) > ranksGvar.index(oldCvar):
         output += f"""-f "{rankDown}|You have been {rankDown} to {current_cvar.name}"\n"""
 
 
