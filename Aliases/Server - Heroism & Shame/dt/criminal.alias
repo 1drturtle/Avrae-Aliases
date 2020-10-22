@@ -1,4 +1,4 @@
-tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb {{image}} -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-rr X]"
+tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb {{image}} -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X]"
 {{pargs=&ARGS&}}
 <drac2>
 pargs=argparse(pargs)      #parse args from the alias
@@ -12,16 +12,17 @@ character().create_cc_nx("Heat", 0, None, None, None) #makes sure they got a Hea
 character().create_cc_nx("Street Cred", 0, None, None, None) #makes sure they got a Street Cred Counter
 #set main string
 returnstr = f''
-# Now we build all the roll bonuses
+# Now we build all the roll bonuses and the specified bonuses for [-ib] [-bb] [-pb]
 intelbonus = str(max(character().skills.investigation.value, character().skills.perception.value))
 blendingbonus = str(character().skills.stealth.value)
 pickbonus = str(max(character().skills.sleightOfHand.value, character().skills.performance.value))
+ib,bb,pb = "+"+str(pargs.get("ib")[0]),"+"+str(pargs.get("bb")[0]),"+"+str(pargs.get("pb")[0])
 # then we iterate through all the rolls number of times of rr, setting total
 for i in range(repeat):
 #make all the rollstr
-  intelroll = vroll(advroll+intelbonus) if pargs.get("withhelp") or pargs.get("iadv") else vroll(defroll+intelbonus)
-  blendingroll = vroll(advroll+blendingbonus) if pargs.get("withhelp") or pargs.get("badv") else vroll(defroll+blendingbonus)
-  pickroll = vroll(advroll+pickbonus) if pargs.get("withhelp") or pargs.get("padv") else vroll(defroll+pickbonus)
+  intelroll = vroll(advroll+intelbonus+ib) if pargs.get("withhelp") or pargs.get("iadv") else vroll(defroll+intelbonus+ib)
+  blendingroll = vroll(advroll+blendingbonus+bb) if pargs.get("withhelp") or pargs.get("badv") else vroll(defroll+blendingbonus+bb)
+  pickroll = vroll(advroll+pickbonus+pb) if pargs.get("withhelp") or pargs.get("padv") else vroll(defroll+pickbonus+pb)
   returnstr += f' -f "Attempt #{i+1}|'
 #define what kinda victim you got
   returnstr += f'**Intel**: {intelroll.full} '
