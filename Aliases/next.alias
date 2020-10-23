@@ -1,0 +1,1 @@
+embed -title "Are you done with your turn?" -desc "Use `!i n` to pass init to the next turn" -thumb <image> -color <color> -footer "!next | Dr Turtle#1771"
