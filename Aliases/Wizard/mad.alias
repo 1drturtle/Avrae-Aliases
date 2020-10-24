@@ -1,1 +1,1 @@
-!alias mad i effect %1% "Mage Armor" -ac {{13+dexterityMod}}
+!alias mad {{f'i effect "{name}" "Mage Armor" -ac {13+dexterityMod}' if combat() and combat().me else 'echo This channel is not in combat, or you have not joined init.'}}
