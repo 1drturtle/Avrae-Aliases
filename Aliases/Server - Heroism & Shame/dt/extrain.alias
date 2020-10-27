@@ -35,15 +35,14 @@ if ch.get_cc(train_c) == days: # If the value of the training CC equals the max 
     ch.set_cc(train_c, 0)      # Reset the training CC to 0
 # Get Adv/Dis/Bonus/Mentor, setup roll_str
 bonus_string = pargs.join('b', '+')
-adv = pargs.adv()
-
-roll_str = '1d20'
 
 mentor = pargs.get('mentor')
-if mentor or adv == 1:
-    roll_str = '2d20kh1'
-elif adv == -1:
-    roll_str = '2d20kl1'
+if mentor:
+    pargs.update({'adv': True})
+
+adv = pargs.adv()
+
+roll_str = ['1d20', '2d20kh1', '2d20kl1'][adv]
 
 roll_str += f'+{skill_b.value}'
 
