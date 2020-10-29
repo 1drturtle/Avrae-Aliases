@@ -1,0 +1,57 @@
+embed <drac2>
+# For Modular setup see ../generic_levelup.alias
+err_str = ' not found in Server Config. Contact a Dragonspeaker.'
+config = load_json(get_svar('eminenceConfig', '{}'))
+err('Server configuration Error with SVAR. Contact a Dragonspeaker') if not config else None
+ranksGvar = load_json(get_gvar(config.get('gvar')))
+rankUp = config.get('rankUp')
+rankDown = config.get('rankDown')
+cvarName = config.get('cvarName')
+ccName = config.get('ccName')
+rank_name = config.get('rankName')
+</drac2>
+<drac2>
+ch=character()
+output = ''
+# Actual Code
+ch.create_cc_nx(ccName, 0)
+oldCvar = load_json(get(cvarName, dump_json(ranksGvar[0])))
+# First, parse input
+args = &ARGS&
+# Add/Remove Points
+level_change = False
+if len(args):
+    user_in = int(args[0])
+    # Add points to CC
+    old_value = ch.get_cc(ccName)
+    new_value = ch.mod_cc(ccName, user_in)
+    delta = new_value - old_value
+    output += f"""-title "{name} {'gains' if delta > 0 else 'removes'} {delta if delta>0 else delta*-1} point{'s' if delta != 1 else ''} of {ccName}"\n"""
+    # Check to see if we leveled up
+    check_level_up = [rank for rank in ranksGvar if new_value >= rank.value]
+    check_level_down = True if oldCvar.value > new_value else False
+    if check_level_up:
+        level_change = True
+        new_cvar = check_level_up[-1]
+        ch.set_cvar(cvarName, dump_json(new_cvar))
+    output += f'-f "{ccName}|{ch.cc_str(ccName)} ({delta:+})"\n'
+current_cvar = load_json(get(cvarName, dump_json(ranksGvar[0])))
+# Get Status
+if not len(args):
+    current = ch.get_cc(ccName)
+    output += f"""-title "{name} has {current} point{'s' if current != 1 else ''} of {ccName}"\n"""
+    output += f"""-f "{ccName}|{current}"\n"""
+    output += f'''-f "{rank_name}|{current_cvar.name}"'''
+# Promoted/Demoted?
+if level_change:
+    # Promoted
+    if ranksGvar.index(new_cvar) > ranksGvar.index(oldCvar):
+        output += f"""-f "{rankUp}|You have been {rankUp} to {current_cvar.name}"\n"""
+    # Demoted
+    elif ranksGvar.index(new_cvar) > ranksGvar.index(oldCvar):
+        output += f"""-f "{rankDown}|You have been {rankDown} to {current_cvar.name}"\n"""
+
+
+return output
+</drac2>
+-thumb <image> -color <color>

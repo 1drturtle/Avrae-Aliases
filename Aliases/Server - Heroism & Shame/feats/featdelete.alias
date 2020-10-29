@@ -1,0 +1,23 @@
+<drac2>
+args=argparse(&ARGS&)
+feats_gvar = get_svar('featsGvar')
+embed_error = f'embed -title "Deletion Error!" -thumb {image} -color {color} -footer "{ctx.prefix}help feats create" '
+if feats_gvar is None:
+	return (embed_error + f'-desc "Feat Lookup not setup correctly. See `{ctx.prefix}help feats create`"')
+loaded_feats = load_json(get_gvar(feats_gvar))
+to_delete = "&1&" if "&1" + "&" != "&1&" else ''
+if not to_delete:
+	return (embed_error + f'-desc "No feat to delete specified .See `{ctx.prefix}help feats create`"')
+authorized = load_json(get_svar('featsAuthorized', '[]'))
+if str(ctx.author.id) not in authorized:
+	return (embed_error + f'-desc "You are not authorized to run this command."')
+# Backup code incase of accidental deletion
+backup = load_json(get('featsBackup', '{}'))
+backup[str(time)] = loaded_feats
+set_uvar('featsBackup', dump_json(backup))
+if to_delete in loaded_feats:
+	loaded_feats.pop(to_delete)
+	return (f'gvar edit {feats_gvar} {dump_json(loaded_feats)}')
+else:
+	return (embed_error + f'-desc "Feat not in list. Must be exact! See `{ctx.prefix}help feats create`"')
+</drac2>

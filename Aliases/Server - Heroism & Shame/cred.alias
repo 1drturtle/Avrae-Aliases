@@ -1,9 +1,0 @@
-embed
-{{ch=character()}}
-{{args=&ARGS&}}
-{{c="Street Cred"}}
-{{ch.create_cc_nx(c, 0)}}
-{{ch.mod_cc(c, int(args[0])) if len(args)>0 else None}}
--title "{{f'{name} has {ch.cc_str(c)} point(s) of Street Cred' if len(args)==0 else f'{name} gains {args[0]} point(s) of Street Cred!'}}"
--f "{{f'Street Cred|{ch.cc_str(c)}'}} {{'(+'+str(args[0])+')' if len(args)>0 else None}}"
--thumb <image> -color <color>

@@ -13,20 +13,12 @@ ch = character()
 pargs = argparse(args[3:])
 
 if len(args) < 3: # Checks to make sure there is at least 3 arguments
-<<<<<<< HEAD:Aliases/Server - Heroism & Shame/dt/train.alias
     err("Not enough arguments - See `!help dt train`")
-=======
-    err("Not enough arguments - See `!help dttrain`")
->>>>>>> 1f5182ffe2a50ff7317fecec49fc1cc35783aea9:Aliases/Server - Heroism & Shame/dttrain.alias
 
 possible_skills = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
 
 skill_name=[skill_name for skill_name in possible_skills if args[2].lower() in skill_name.lower()]
-<<<<<<< HEAD:Aliases/Server - Heroism & Shame/dt/train.alias
 skill_name=skill_name[0] if len(skill_name) > 0 else err("Invalid Skill - See `!help dt train`")
-=======
-skill_name=skill_name[0] if len(skill_name) > 0 else err("Invalid Skill - See `!help dttrain`")
->>>>>>> 1f5182ffe2a50ff7317fecec49fc1cc35783aea9:Aliases/Server - Heroism & Shame/dttrain.alias
 
 skill_b = ch.skills[skill_name] # Get the skill bonus for the Skill
 slot_c = "DT Slot" # Sets the name for the DT Slot CC
@@ -40,15 +32,16 @@ if ch.get_cc(train_c) == days: # If the value of the training CC equals the max 
     ch.set_cc(train_c, 0)      # Reset the training CC to 0
 # Get Adv/Dis/Bonus/Mentor, setup roll_str
 bonus_string = pargs.join('b', '+')
-adv = pargs.adv()
 
 roll_str = '1d20'
 
 mentor = pargs.get('mentor')
-if mentor or adv == 1:
-    roll_str = '2d20kh1'
-elif adv == -1:
-    roll_str = '2d20kl1'
+if mentor:
+    pargs.update({'adv': True})
+
+adv = pargs.adv()
+
+roll_str = ['1d20', '2d20kh1', '2d20kl1'][adv]
 
 roll_str += f'+{skill_b.value}'
 
