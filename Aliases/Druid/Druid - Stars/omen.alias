@@ -1,6 +1,6 @@
 !alias omen embed -title "{{name}} uses their Cosmic Omen Feature!" -thumb <image> -color <color>
 <drac2>
-if int(get('DruidLevel', 0)) < 2 or 'DruidLevel' not in (sc := load_json(get('subclass', '{}'))) or sc['DruidLevel'] != 'Stars':
+if int(get('DruidLevel', 0)) < 6 or 'DruidLevel' not in (sc := load_json(get('subclass', '{}'))) or sc['DruidLevel'] != 'Stars':
 	err('You are not a Stars Druid!')
 char=character()
 args=&ARGS&
