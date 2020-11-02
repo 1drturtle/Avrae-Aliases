@@ -16,7 +16,9 @@ returnstr = f''
 intelbonus = str(max(character().skills.investigation.value, character().skills.perception.value))
 blendingbonus = str(character().skills.stealth.value)
 pickbonus = str(max(character().skills.sleightOfHand.value, character().skills.performance.value))
-ib,bb,pb = "+"+str(pargs.get("ib")[0]),"+"+str(pargs.get("bb")[0]),"+"+str(pargs.get("pb")[0])
+ib = "+"+pargs.join('ib', '+') if parg.get("ib") else ""
+bb = "+"+pargs.join('bb', '+') if parg.get("bb") else ""
+pb = "+"+pargs.join('pb', '+') if parg.get("pb") else ""
 # then we iterate through all the rolls number of times of rr, setting total
 for i in range(repeat):
 #make all the rollstr
