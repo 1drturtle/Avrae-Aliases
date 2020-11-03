@@ -6,4 +6,4 @@ You're free to copy and use them, and if you have any issues open an issue, or i
 
 # Contributing
 
-If you would like to contribute to my aliases, either contact me on discord (Dr Turtle#1771) or open a PR using the template in this repository. If you find an issue/bug with an alias (Not one in the "Personal" folder), go ahead and open an issue.
+If you would like to contribute to my aliases, either contact me on discord (Dr Turtle#1771) or open a PR using the template in this repository. If you find an issue/bug with an alias (Not one in the "Personal" folder), go ahead and open an issue. Thanks!

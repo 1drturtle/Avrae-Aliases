@@ -1,3 +1,4 @@
 embed -title "Heroism and Shame Luck!!!" -f "Roll: {{str(vroll('1d100'))}}"
 -f "On rare occasions you will be asked to roll for luck, sometimes a situation can go purely well or very bad. This is commonly used when travelling, when communicating to patrons/gods or whenever the DM feels."
 -image "https://i.pinimg.com/originals/58/60/cd/5860cd7421f38a800897d87eb17d455f.jpg"
+-thumb <image> -color <color>
