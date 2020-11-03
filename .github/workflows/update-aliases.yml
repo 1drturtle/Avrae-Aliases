@@ -1,9 +1,11 @@
 name: Update Aliases
-on: [push]
+on:
+  push:
+    branches:
+      - master
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/head/master'
     steps:
     - uses: actions/checkout@v2
     - id: modifed
