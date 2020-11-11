@@ -43,17 +43,17 @@ for i in range(repeat):
     coinbonus = 1.5 if perfconroll.total >= 21 and seductroll.total >= 21 \
         else 1.25 if seductroll.total >= 21 else 1.1 if seductroll >= 15 else 1
     #builds all the earning rolls based on skills rolls
-    if perfconroll >= 21:
+    if perfconroll.total >= 21:
         coinroll = vroll("3d8+10") if client == "Noble" \
             else vroll("3d6+30") if client == "ModestMan" \
             else vroll("3d4+10") if client == "Commoner" \
             else vroll("0")
-    elif perfconroll >= 15:
+    elif perfconroll.total >= 15:
         coinroll = vroll("1d10+10") if client == "Noble" \
             else vroll("1d8+30") if client == "ModestMan" \
             else vroll("1d6+10") if client == "Commoner" \
             else vroll("0")
-    elif perfconroll >= 10:
+    elif perfconroll.total >= 10:
         coinroll = vroll("10") if client == "Noble" \
             else vroll("30") if client == "ModestMan" \
             else vroll("10") if client == "Commoner" \
