@@ -1,4 +1,4 @@
-tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
+tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -color <color> -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
 <drac2>
 #sets primary variables
 pargs, returnstr, me, isObservant, passRoll=argparse(&ARGS&),  f'', character(), False if "Observant" not in feats else True, "10"
@@ -8,9 +8,9 @@ defroll,advroll,ratgp,middlegp,modestgp,noblegp= "1d20+","2d20kh1+","1d4+1","1d6
 #set all counters
 earnmod,coincount,totalCred,heatCounter,repeat= 0,0,0,0,int(pargs.get("rr")[0]) if pargs.get("rr") else 1
 #get current heat and credits
+me.create_cc_nx("Heat", 0, None, None, None)  # makes sure they got a Heat counter, like a good criminal should
+me.create_cc_nx("Street Cred", 0, None, None, None)  # makes sure they got a Street Cred Counter
 oheat, ocred = me.get_cc("Heat"), me.get_cc("Street Cred")
-me.create_cc_nx("Heat", 0, None, None, None) #makes sure they got a Heat counter, like a good criminal should
-me.create_cc_nx("Street Cred", 0, None, None, None) #makes sure they got a Street Cred Counter
 # Now we build all the roll bonuses and the specified bonuses for [-ib] [-bb] [-pb]
 intelbonus = str(max(me.skills.investigation.value, me.skills.perception.value))
 blendingbonus = str(me.skills.stealth.value)
@@ -28,7 +28,7 @@ for i in range(repeat):
 #make all the rollstr
   passintelroll = vroll(passRoll)
   intelroll = vroll(advroll+intelbonus+ib) if pargs.get("withhelp") or pargs.get("iadv") else vroll(defroll+intelbonus+ib)
-  intelroll = passintelroll if usingPassive and passintelroll.total > intelroll.total else intelroll
+  intelroll = passintelroll if usingPassive else intelroll
   blendingroll = vroll(advroll+blendingbonus+bb) if pargs.get("withhelp") or pargs.get("badv") else vroll(defroll+blendingbonus+bb)
   pickroll = vroll(advroll+pickbonus+pb) if pargs.get("withhelp") or pargs.get("padv") else vroll(defroll+pickbonus+pb)
   returnstr += f' -f "Attempt #{i+1}|'
