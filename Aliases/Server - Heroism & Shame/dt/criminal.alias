@@ -15,18 +15,18 @@ me.create_cc_nx("Street Cred", 0, None, None, None) #makes sure they got a Stree
 intelbonus = str(max(me.skills.investigation.value, me.skills.perception.value))
 blendingbonus = str(me.skills.stealth.value)
 pickbonus = str(max(me.skills.sleightOfHand.value, me.skills.performance.value))
-ib = "+"+pargs.join('ib', '+') if parg.get("ib") else ""
-bb = "+"+pargs.join('bb', '+') if parg.get("bb") else ""
-pb = "+"+pargs.join('pb', '+') if parg.get("pb") else ""
+ib = "+"+pargs.join('ib', '+') if pargs.get("ib") else ""
+bb = "+"+pargs.join('bb', '+') if pargs.get("bb") else ""
+pb = "+"+pargs.join('pb', '+') if pargs.get("pb") else ""
 #builds the passive roll
 if usingPassive:
-  passroll += "+"+intelbonus
-  passroll += observantBonus if isObervant else ""
-  passroll += passiveAdv if pargs.get("iadv") else ""
+  passRoll += "+"+intelbonus
+  passRoll += observantBonus if isObservant else ""
+  passRoll += passiveAdv if pargs.get("iadv") else ""
 # then we iterate through all the rolls number of times of rr, setting total
 for i in range(repeat):
 #make all the rollstr
-  passintelroll = vroll(passroll)
+  passintelroll = vroll(passRoll)
   intelroll = vroll(advroll+intelbonus+ib) if pargs.get("withhelp") or pargs.get("iadv") else vroll(defroll+intelbonus+ib)
   intelroll = passintelroll if usingPassive and passintelroll.total > intelroll.total else intelroll
   blendingroll = vroll(advroll+blendingbonus+bb) if pargs.get("withhelp") or pargs.get("badv") else vroll(defroll+blendingbonus+bb)
