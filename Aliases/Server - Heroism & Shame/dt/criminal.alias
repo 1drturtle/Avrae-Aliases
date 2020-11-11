@@ -1,28 +1,34 @@
-tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb {{image}} -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X]"
-{{pargs=&ARGS&}}
+tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -color <color> -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
 <drac2>
-pargs=argparse(pargs)      #parse args from the alias
+#sets primary variables
+pargs, returnstr, me, isObservant, passRoll=argparse(&ARGS&),  f'', character(), False if "Observant" not in feats else True, "10"
+usingPassive, passiveAdv, observantBonus = True if pargs.get("passive") else False, "" if not pargs.get("iadv") else "+5[advantage]", "" if not isObservant else "+5[observant]"
 #set all rolls
 defroll,advroll,ratgp,middlegp,modestgp,noblegp= "1d20+","2d20kh1+","1d4+1","1d6+10","1d8+30","1d10+100"
 #set all counters
 earnmod,coincount,totalCred,heatCounter,repeat= 0,0,0,0,int(pargs.get("rr")[0]) if pargs.get("rr") else 1
 #get current heat and credits
-oheat, ocred = character().get_cc("Heat"), character().get_cc("Street Cred")
-character().create_cc_nx("Heat", 0, None, None, None) #makes sure they got a Heat counter, like a good criminal should
-character().create_cc_nx("Street Cred", 0, None, None, None) #makes sure they got a Street Cred Counter
-#set main string
-returnstr = f''
+me.create_cc_nx("Heat", 0, None, None, None)  # makes sure they got a Heat counter, like a good criminal should
+me.create_cc_nx("Street Cred", 0, None, None, None)  # makes sure they got a Street Cred Counter
+oheat, ocred = me.get_cc("Heat"), me.get_cc("Street Cred")
 # Now we build all the roll bonuses and the specified bonuses for [-ib] [-bb] [-pb]
-intelbonus = str(max(character().skills.investigation.value, character().skills.perception.value))
-blendingbonus = str(character().skills.stealth.value)
-pickbonus = str(max(character().skills.sleightOfHand.value, character().skills.performance.value))
-ib = "+"+pargs.join('ib', '+') if parg.get("ib") else ""
-bb = "+"+pargs.join('bb', '+') if parg.get("bb") else ""
-pb = "+"+pargs.join('pb', '+') if parg.get("pb") else ""
+intelbonus = str(max(me.skills.investigation.value, me.skills.perception.value))
+blendingbonus = str(me.skills.stealth.value)
+pickbonus = str(max(me.skills.sleightOfHand.value, me.skills.performance.value))
+ib = "+"+pargs.join('ib', '+') if pargs.get("ib") else ""
+bb = "+"+pargs.join('bb', '+') if pargs.get("bb") else ""
+pb = "+"+pargs.join('pb', '+') if pargs.get("pb") else ""
+#builds the passive roll
+if usingPassive:
+  passRoll += "+"+intelbonus
+  passRoll += observantBonus if isObservant else ""
+  passRoll += passiveAdv if pargs.get("iadv") else ""
 # then we iterate through all the rolls number of times of rr, setting total
 for i in range(repeat):
 #make all the rollstr
+  passintelroll = vroll(passRoll)
   intelroll = vroll(advroll+intelbonus+ib) if pargs.get("withhelp") or pargs.get("iadv") else vroll(defroll+intelbonus+ib)
+  intelroll = passintelroll if usingPassive else intelroll
   blendingroll = vroll(advroll+blendingbonus+bb) if pargs.get("withhelp") or pargs.get("badv") else vroll(defroll+blendingbonus+bb)
   pickroll = vroll(advroll+pickbonus+pb) if pargs.get("withhelp") or pargs.get("padv") else vroll(defroll+pickbonus+pb)
   returnstr += f' -f "Attempt #{i+1}|'
@@ -50,7 +56,7 @@ for i in range(repeat):
     returnstr += f'(Well hidden)\n'
   else:
     returnstr += f'(**Spotted**, take Heat `+1`)\n'
-    character().mod_cc("Heat", +1) #take it!
+    me.mod_cc("Heat", +1) #take it!
     heatCounter += 1
 #define the earning mod roll
   if blendingroll.total >= 10: #autofails if second roll is failed
@@ -67,14 +73,14 @@ for i in range(repeat):
     else:
       returnstr += f'(**Caught**, take Heat `+2`)\n'
       earnmod = 0
-      character().mod_cc("Heat", +2) #take it!
+      me.mod_cc("Heat", +2) #take it!
       heatCounter += 2
   else:
     returnstr += f'**Pick-pocket**: AutoFail. You were spotted.\n'
     earnmod = 0
   #Successful Crime, get the Cred
   successCrime = True if blendingroll.total >= 10 and pickroll.total >= 10 else False
-  character().mod_cc("Street Cred", +1) if successCrime else 0
+  me.mod_cc("Street Cred", +1) if successCrime else 0
   totalCred = totalCred +1 if successCrime else totalCred+0
   #coins calculations for this attempt
   coinearn = earnroll.total * (earnmod)
