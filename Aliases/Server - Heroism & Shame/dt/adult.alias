@@ -9,6 +9,7 @@ rollstr, repeat, mainstringy, me= "2d20kh1+" if pargs.adv() == 1 else "1d20+", 1
 # presets the needed counters
 me.create_cc_nx("Heat", 0, None, None, None)
 me.create_cc_nx("Street Cred", 0, None, None, None)
+me.create_cc_nx("DT Slot", "0", "2", "none", "bubble")
 #Now we build all the checks variables
 perctup, invetup, perftup, perstup = ("perception", me.skills.perception.value), ("investigation", me.skills.perception.value), ("performance", me.skills.performance.value), ("persuasion", me.skills.persuasion.value)
 searchbonus, searchskill, seductbonus, seductskill, perfconbonus = invetup[1] if invetup[1] > perctup[1] else perctup[1], invetup[0] if invetup[1] > perctup[1] else perctup[0], perftup[1] if perftup[1] > perstup[1] else perstup[1], perftup[0] if perftup[1] > perstup[1] else perstup[0], (perftup[1] - charismaMod) + constitutionMod
@@ -22,26 +23,26 @@ for i in range(repeat):
         else "Commoner" if searchroll.total >= 10 else "No Client Found"
     seductroll = vroll("0") if client == "No Client Found" else seductroll
     seduct = "No one to seduce :(" if client == "No Client Found" \
-        else f'"Expertly seduce {client}: 25% tip"' if seductroll.total >= 21 \
-        else  f'"Tease the {client}: 10% tip"' if seductroll.total >= 15 \
-        else f'"Convinced {client} to bed"' if seductroll.total >= 10 \
+        else f'Expertly seduce {client}: 25% tip' if seductroll.total >= 21 \
+        else  f'Tease the {client}: 10% tip' if seductroll.total >= 15 \
+        else f'Convinced {client} to bed' if seductroll.total >= 10 \
         else "Seduction Failed: +1 Heat"
     perfconroll = vroll("0") if client == "No Client Found" or seduct == "Seduction Failed: +1 Heat" else perfconroll
     fuck = "No one to do it :(" if client == "No Client Found" or seduct == "No one to seduce :(" \
-        else f'"Earth-shattering, {client} impressed: +1 Street Cred  +25% tip"' if perfconroll.total  >= 21 \
-        else f'"Earth-shattering {client} impressed: +1 Street Cred"' if perfconroll.total >= 21 and seductroll.total >= 21 \
-        else f'{client} satisfied :)"' if perfconroll.total >= 15 \
-        else f'{client} finds you acceptable, but unremarkable"' if perfconroll.total >= 10 \
+        else f'Earth-shattering, {client} impressed: +1 Street Cred  +25% tip' if perfconroll.total  >= 21 \
+        else f'Earth-shattering {client} impressed: +1 Street Cred' if perfconroll.total >= 21 and seductroll.total >= 21 \
+        else f'{client} satisfied :)' if perfconroll.total >= 15 \
+        else f'{client} finds you acceptable, but unremarkable' if perfconroll.total >= 10 \
         else "Eww. You did bad : +1 Heat, -1 Street Cred"
     # adds up heat
     newheat += 1 if "Heat" in seduct else 0
     newheat += 1 if "Heat" in fuck else 0
     # adds up Street Cred
     newcred += 1 if "+1 Street" in fuck else 0
-    newcred -+ 1 if "-1 Street" in fuck else 0
+    newcred -= 1 if "-1 Street" in fuck else 0
     # adds up coin bonus
     coinbonus = 1.5 if perfconroll.total >= 21 and seductroll.total >= 21 \
-        else 1.25 if seductroll.total >= 21 else 1.1 if seductroll >= 15 else 1
+        else 1.25 if seductroll.total >= 21 else 1.1 if seductroll.total >= 15 else 1
     #builds all the earning rolls based on skills rolls
     if perfconroll.total >= 21:
         coinroll = vroll("3d8+10") if client == "Noble" \
@@ -64,10 +65,10 @@ for i in range(repeat):
     pp, gp = coinroll.total * coinbonus if client == "Noble" else 0, coinroll.total * coinbonus if client != "Noble" else 0
     # converts down to cp
     tpp = floor(pp - (pp-int(pp))) # assigns the full integer of pp to temp pp
-    tgp = gp + ((pp-int(pp))* 10) # assigns the remainder of pp and rolled gp to temp gp
-    tsp = ((tgp-int(tgp))* 10) #assigns the remainder of tgp to tsp
+    tgp = round(gp + ((pp-int(pp))* 10),2) # assigns the remainder of pp and rolled gp to temp gp
+    tsp = round(((tgp-int(tgp))* 10),2) #assigns the remainder of tgp to tsp
     tgp = floor(tgp - (tgp-int(tgp))) # assigns the full integer of gp to temp gp
-    tcp = ((tsp-int(tsp))* 10) # assigns to remainder of tsp to tcp
+    tcp = round(((tsp-int(tsp))* 10),2) # assigns to remainder of tsp to tcp
     #passes all temp values to new values
     npp += tpp
     ngp += tgp
@@ -83,19 +84,22 @@ for i in range(repeat):
 # pulls current coins, updates pouch, and pushes it back to cvar
 bagsLoaded = load_json(bags)
 pouch = ([x for x in bagsLoaded if x[0] == "Coin Pouch"])[0]
-opp, ogp, osp, ocp = pouch['pp'], pouch['gp'], pouch['sp'], pouch['cp']
+opp, ogp, osp, ocp = pouch[1]['pp'], pouch[1]['gp'], pouch[1]['sp'], pouch[1]['cp']
 pouch[1].update({'pp':opp+npp,'gp':ogp+ngp,'sp':osp+nsp,'cp':ocp+ncp})
 pouch in bagsLoaded or bagsLoaded.append(pouch)
 set_cvar("bags",dump_json(bagsLoaded))
-
-returnstr += f' -f "**Getting Paid** | Your coin pouch went from: ' \
+# updates heat and cred
+me.mod_cc("Heat", +newheat)
+me.mod_cc("Street Cred", +newcred)
+#builds bottom portion of return string
+returnstr += f' -f "**Getting Paid** | Your coin pouch went from: \n' \
     f'`{str(opp)}` => `{str(opp+npp)}` pp \n' \
     f'`{str(ogp)}` => `{str(ogp+ngp)}` gp \n' \
     f'`{str(osp)}` => `{str(osp+nsp)}` sp \n' \
     f'`{str(ocp)}` => `{str(ocp+ncp)}` cp \n' \
-    f'Current Heat: `{cc_str("Heat") if cc_exists("Heat") else " " }` \n' \
-    f'Current Street Cred: `{cc_str("Street Cred") if cc_exists("Street Cred") else ""}`' \
-    f'DT Remaining: `{mod_cc("DT Slot",-2)}{cc_str("DT Slot")}`"' \
+    f'Current Heat: `{me.cc_str("Heat") if me.cc_exists("Heat") else " " }` \n' \
+    f'Current Street Cred: `{me.cc_str("Street Cred") if me.cc_exists("Street Cred") else ""}` \n' \
+    f'DT Remaining: `{me.mod_cc("DT Slot",-2)}{me.cc_str("DT Slot")}`"' \
     f' -footer "!help dt adult    |  v5 by by mrrobinhood5#1999"' \
     f' -title "{name}: {title}"'
 return returnstr
