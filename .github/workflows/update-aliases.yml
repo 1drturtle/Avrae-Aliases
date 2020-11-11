@@ -1,0 +1,19 @@
+name: Update Aliases
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - id: modifed
+      uses: jitterbit/get-changed-files@master
+      with: 
+        format: 'json'
+    - uses: 1drturtle/avrae-alias-update-action@master
+      with:
+        avrae-token: '${{ secrets.AVRAETOKEN }}'
+        alias_id_file_name: 'alias-ids.json'
+        modified-files: '${{ steps.modifed.outputs.added_modified }}'
