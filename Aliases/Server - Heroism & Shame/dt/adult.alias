@@ -1,233 +1,106 @@
-tembed
+tembed -thumb <image> -color <color>
 <drac2>
 # Written By: MrRobinhood5#1999
-title = load_json(get_gvar("48729b0f-c54a-4a33-b2ca-ff6c92b19700"))[vroll('1d400').total-1].thing
-</drac2>
--title """{{name}}: {{title}}""" -thumb <image> -color <color>
-{{pargs=&ARGS&}}
-<drac2>
-pargs=argparse(pargs)      #parse args from the alias
-if pargs.adv() == 1:       #Checks to see if ADV was passed
-    rollstr = "2d20kh1+"   #If so, build the base roll str on that
-else:
-    rollstr = "1d20+"      #else basic roll string
-
-if pargs.get("rr"):        #ches to see if rr is passed
-    repeat = int(pargs.get("rr")[0])   #sets repeat to the number of rrs
-else:
-    repeat = 1             #or just one roll if no rrs
-mainstringy = []               # creates the main string
-
+# loads primary variables
+pargs, title, returnstr, newheat, newcred = argparse(&ARGS&), load_json(get_gvar("48729b0f-c54a-4a33-b2ca-ff6c92b19700"))[vroll('1d400').total-1].thing, "", 0, 0
+pp, gp, sp, cp, npp, ngp, nsp, ncp = 0, 0, 0, 0, 0, 0, 0, 0
+# loads secondary variables
+rollstr, repeat, mainstringy, me= "2d20kh1+" if pargs.adv() == 1 else "1d20+", 1 if not pargs.get("rr") else int(pargs.get("rr")[0]), [], character()
+# presets the needed counters
+me.create_cc_nx("Heat", 0, None, None, None)
+me.create_cc_nx("Street Cred", 0, None, None, None)
+me.create_cc_nx("DT Slot", "0", "2", "none", "bubble")
 #Now we build all the checks variables
+perctup, invetup, perftup, perstup = ("perception", me.skills.perception.value), ("investigation", me.skills.perception.value), ("performance", me.skills.performance.value), ("persuasion", me.skills.persuasion.value)
+searchbonus, searchskill, seductbonus, seductskill, perfconbonus = invetup[1] if invetup[1] > perctup[1] else perctup[1], invetup[0] if invetup[1] > perctup[1] else perctup[0], perftup[1] if perftup[1] > perstup[1] else perstup[1], perftup[0] if perftup[1] > perstup[1] else perstup[0], (perftup[1] - charismaMod) + constitutionMod
 
-#first check for perceptions or investigation, whichever is greater and put in the bonus for the first roll.
-if get_raw().skills["perception"] > get_raw().skills["investigation"]:
-    searchbonus = get_raw().skills["perception"]
-    firstskill = "Perception"
-else:
-    searchbonus = get_raw().skills["investigation"]
-    firstskill = "Investigation"
-#second check for persuasion or performance, whicehver is greater and put bonus for second roll.
-if get_raw().skills["performance"] > get_raw().skills["persuasion"]:
-    seductbonus = get_raw().skills["performance"]
-    secondskill = "Performance"
-else:
-    seductbonus = get_raw().skills["persuasion"]
-    secondskill = "Persuasion"
-#last check is set to performance and con and sets up the bonuses.
-perfbonus=get_raw().skills["performance"]
-perfconbonus = (perfbonus - charismaMod) + constitutionMod
-
-#then we iterate through all the rolls number of times of rr, setting total n
+# iterate through all the repeats
 for i in range(repeat):
-    current = {}  #setups the current dict
-#Rolls ther first searchroll
-    current['searchroll'] = vroll(rollstr+str(searchbonus))
-#evaluates first roll results
-    if current['searchroll'].total >= 21:
-        current['client']="Noble"
-    elif current['searchroll'].total >= 15:
-        current['client']="ModestMan"
-    elif current['searchroll'].total >= 10:
-        current['client']="Commoner"
+    # build all the rolls first
+    searchroll, seductroll, perfconroll = vroll(rollstr+str(searchbonus)), vroll(rollstr+str(seductbonus)), vroll(rollstr+str(perfconbonus))
+    # set the results for each roll
+    client = "Noble" if searchroll.total >= 21 else "ModestMan" if searchroll.total >= 15 \
+        else "Commoner" if searchroll.total >= 10 else "No Client Found"
+    seductroll = vroll("0") if client == "No Client Found" else seductroll
+    seduct = "No one to seduce :(" if client == "No Client Found" \
+        else f'Expertly seduce {client}: 25% tip' if seductroll.total >= 21 \
+        else  f'Tease the {client}: 10% tip' if seductroll.total >= 15 \
+        else f'Convinced {client} to bed' if seductroll.total >= 10 \
+        else "Seduction Failed: +1 Heat"
+    perfconroll = vroll("0") if client == "No Client Found" or seduct == "Seduction Failed: +1 Heat" else perfconroll
+    fuck = "No one to do it :(" if client == "No Client Found" or seduct == "No one to seduce :(" \
+        else f'Earth-shattering, {client} impressed: +1 Street Cred  +25% tip' if perfconroll.total  >= 21 \
+        else f'Earth-shattering {client} impressed: +1 Street Cred' if perfconroll.total >= 21 and seductroll.total >= 21 \
+        else f'{client} satisfied :)' if perfconroll.total >= 15 \
+        else f'{client} finds you acceptable, but unremarkable' if perfconroll.total >= 10 \
+        else "Eww. You did bad : +1 Heat, -1 Street Cred"
+    # adds up heat
+    newheat += 1 if "Heat" in seduct else 0
+    newheat += 1 if "Heat" in fuck else 0
+    # adds up Street Cred
+    newcred += 1 if "+1 Street" in fuck else 0
+    newcred -= 1 if "-1 Street" in fuck else 0
+    # adds up coin bonus
+    coinbonus = 1.5 if perfconroll.total >= 21 and seductroll.total >= 21 \
+        else 1.25 if seductroll.total >= 21 else 1.1 if seductroll.total >= 15 else 1
+    #builds all the earning rolls based on skills rolls
+    if perfconroll.total >= 21:
+        coinroll = vroll("3d8+10") if client == "Noble" \
+            else vroll("3d6+30") if client == "ModestMan" \
+            else vroll("3d4+10") if client == "Commoner" \
+            else vroll("0")
+    elif perfconroll.total >= 15:
+        coinroll = vroll("1d10+10") if client == "Noble" \
+            else vroll("1d8+30") if client == "ModestMan" \
+            else vroll("1d6+10") if client == "Commoner" \
+            else vroll("0")
+    elif perfconroll.total >= 10:
+        coinroll = vroll("10") if client == "Noble" \
+            else vroll("30") if client == "ModestMan" \
+            else vroll("10") if client == "Commoner" \
+            else vroll("0")
     else:
-        current['client']="No Client Found"
-#zeroes out the second roll if the first one failed, otherwise, it rolls second roll
-    if current['client'] == "No Client Found":
-        current['seductroll'] = vroll("0")
-        current['seductresult'] ="No one to seduce :("
-    else:
-        current['seductroll'] = vroll(rollstr+str(seductbonus))
-#evaluates second roll results
-    if current['seductroll'].total >= 21:
-        current['seductresult']="Expertly seduce "+current['client']+": 25% tip"
-    elif current['seductroll'].total >= 15:
-        current['seductresult']="Tease the "+current['client']+": 10% tip"
-    elif current['seductroll'].total >= 10:
-        current['seductresult']="Convinced "+current['client']+" to bed"
-    elif current['seductroll'].total == 0:
-        current['seductresult']="No one to seduce :("
-    else:
-        c="Heat"
-        create_cc_nx(c,0)
-        mod_cc(c, 1)
-        current['seductresult']="Seduction Failed: +1 Heat"
-#zeroes out third roll if first or second roll Failed and rolls third if not
-    if current['client'] == "No Client Found":
-        current['perfconroll'] = vroll("0")
-        current['fuckresult'] ="No one to seduce :("
-    elif current['seductresult']=="Seduction Failed: +1 Heat":
-        current['perfconroll'] = vroll("0")
-        current['fuckresult']="No one to do it :("
-    else:
-        current['perfconroll'] = vroll(rollstr+str(perfconbonus))
-#evaluates third roll
-    if current['perfconroll'].total >= 21:
-        if current['seductroll'].total >= 21:
-            current['fuckresult']="Earth-shattering, "+current['client']+" impressed: +1 Street Cred  +25% tip"
-        else:
-            current['fuckresult']="Earth-shattering "+current['client']+" impressed: +1 Street Cred"
-        c="Street Cred"
-        create_cc_nx(c,0)
-        mod_cc(c, 1)
-    elif current['perfconroll'].total >= 15:
-        current['fuckresult']= current['client']+" satisfied :)"
-    elif current['perfconroll'].total >= 10:
-        current['fuckresult']= current['client']+" finds you acceptable, but unremarkable"
-    elif current['perfconroll'].total == 0:
-        current['fuckresult']= "No one to do it :("
-    else:
-        c="Heat"
-        create_cc_nx(c,0)
-        mod_cc(c, 1)
-        c="Street Cred"
-        create_cc_nx(c,0)
-        mod_cc(c, -1)
-        current['fuckresult']="Eww. You did bad : +1 Heat, -1 Street Cred"
-#calculates earining bonus for the iteration
-    if current['seductroll'].total >= 21:
-        if current['perfconroll'].total >= 21:
-            current['coinbonus']=1.5
-        else:
-            current['coinbonus']=1.25
-    elif current['seductroll'].total >= 15:
-        current['coinbonus']=1.1
-    else:
-        current['coinbonus']=1
+        coinroll = vroll("0")
+    # grabs the coin rolls
+    pp, gp = coinroll.total * coinbonus if client == "Noble" else 0, coinroll.total * coinbonus if client != "Noble" else 0
+    # converts down to cp
+    tpp = floor(pp - (pp-int(pp))) # assigns the full integer of pp to temp pp
+    tgp = round(gp + ((pp-int(pp))* 10),2) # assigns the remainder of pp and rolled gp to temp gp
+    tsp = round(((tgp-int(tgp))* 10),2) #assigns the remainder of tgp to tsp
+    tgp = floor(tgp - (tgp-int(tgp))) # assigns the full integer of gp to temp gp
+    tcp = round(((tsp-int(tsp))* 10),2) # assigns to remainder of tsp to tcp
+    #passes all temp values to new values
+    npp += tpp
+    ngp += tgp
+    nsp += tsp
+    ncp += tcp
+    #builds the iteration return str
+    returnstr += f' -f "__Attempt # {i+1}__|{coinroll}: Bonus = x `{coinbonus}`\n' \
+                 f'`{tpp}` pp,`{tgp}` gp, `{tsp}` sp, `{tcp}` cp"\n' \
+                 f' -f "**Client Search** | *{searchskill}*\n{searchroll}\nClient: {client}|inline"\n' \
+                 f' -f "**Seducing Client** | *{seductskill}*\n {seductroll}\n{seduct}|inline"\n' \
+                 f' -f "**Satisfaction Roll** |\n*Constitution(Performance)*\n{perfconroll}\n{fuck}|inline"\n'
 
-#calculates all the earnings in the current iteration
-    current['pp'] = 0
-    current['gp'] = 0
-    current['sp'] = 0
-    current['cp'] = 0
-    if current['perfconroll'].total >= 21:
-        if current['client'] == "Noble":
-            current['coinroll'] = vroll("3d8+10")
-            current['pp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "ModestMan":
-            current['coinroll'] = vroll("3d6+30")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "Commoner":
-            current['coinroll'] = vroll("3d4+10")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-
-    elif current['perfconroll'].total >= 15:
-        if current['client'] == "Noble":
-            current['coinroll'] = vroll("1d10+10")
-            current['pp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "ModestMan":
-            current['coinroll'] = vroll("1d8+30")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "Commoner":
-            current['coinroll'] = vroll("1d6+10")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-
-    elif current['perfconroll'].total >= 10:
-        if current['client'] == "Noble":
-            current['coinroll'] = vroll("10")
-            current['pp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "ModestMan":
-            current['coinroll'] = vroll("30")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-        elif current['client'] == "Commoner":
-            current['coinroll'] = vroll("10")
-            current['gp'] = current['coinroll'].total*current['coinbonus']
-    else:
-        current['coinroll']= vroll("0")
-        current['pp']=current['coinroll'].total*current['coinbonus']
-
-#pass through all the coins and sort down
-    convertedgp, convertedsp, convertedcp = 0,0,0
-#passes extra pp into gp
-    convertedgp = current['pp']-int(current['pp'])
-    current['pp'] = floor(current['pp'] - convertedgp)
-    convertedgp = convertedgp * 10
-    current['gp'] = current['gp'] + convertedgp
-
-
-    convertedsp = current['gp']-int(current['gp'])
-    current['gp'] = floor(current['gp'] - convertedsp)
-    convertedsp = convertedsp * 10
-    current['sp'] = current['sp'] + convertedsp
-
-
-    convertedcp = current['sp']-int(current['sp'])
-    current['sp'] = floor(current['sp'] - convertedcp)
-    convertedcp = convertedcp * 10
-    current['cp'] = floor(current['cp'] + convertedcp)
-
-
-    mainstringy.append(current)
-
-#need to iterate throught all the coins and add them up.
-totalpp, totalgp, totalsp, totalcp = 0,0,0,0
-for i in range(len(mainstringy)):
-    totalpp += mainstringy[i].pp
-    totalgp += mainstringy[i].gp
-    totalsp += mainstringy[i].sp
-    totalcp += mainstringy[i].cp
-
-##### Loading Coins
-bagsLoaded=load_json(bags)
-pouch=([x for x in bagsLoaded if x[0]=="Coin Pouch"])[0]
-oldpp = pouch[1]['pp'] #how many coins before
-oldgp = pouch[1]['gp']
-oldsp = pouch[1]['sp']
-oldcp = pouch[1]['cp']
-
-pouch[1].update({'pp':pouch[1]['pp']+floor(totalpp)})
-pouch[1].update({'gp':pouch[1]['gp']+floor(totalgp)})
-pouch[1].update({'sp':pouch[1]['sp']+floor(totalsp)})
-pouch[1].update({'cp':pouch[1]['cp']+floor(totalcp)})
-
+# pulls current coins, updates pouch, and pushes it back to cvar
+bagsLoaded = load_json(bags)
+pouch = ([x for x in bagsLoaded if x[0] == "Coin Pouch"])[0]
+opp, ogp, osp, ocp = pouch[1]['pp'], pouch[1]['gp'], pouch[1]['sp'], pouch[1]['cp']
+pouch[1].update({'pp':opp+npp,'gp':ogp+ngp,'sp':osp+nsp,'cp':ocp+ncp})
 pouch in bagsLoaded or bagsLoaded.append(pouch)
-
-newpp= pouch[1]['pp']  #how many coins after
-newgp=pouch[1]['gp']
-newsp=pouch[1]['sp']
-newcp=pouch[1]['cp']
 set_cvar("bags",dump_json(bagsLoaded))
-
-
-#printout the rolls
-finalrollstr =""
-for i in range(len(mainstringy)):
-    finalrollstr += f'-f "__Attempt # {i+1}__|{mainstringy[i].coinroll}: Bonus = x `{mainstringy[i].coinbonus}`\n \
-    `{mainstringy[i].pp}` pp,`{mainstringy[i].gp}` gp, `{mainstringy[i].sp}` sp, `{mainstringy[i].cp}` cp"\n \
-    -f "**Client Search** | *{firstskill}*\n{mainstringy[i].searchroll}\nClient: {mainstringy[i].client}|inline"\n \
-    -f "**Seducing Client** | *{secondskill}*\n {mainstringy[i].seductroll}\n{mainstringy[i].seductresult}|inline"\n \
-    -f "**Satisfaction Roll** |\n*CON(Performance)*\n{mainstringy[i].perfconroll}\n{mainstringy[i].fuckresult}|inline"\n'
-
-return finalrollstr
+# updates heat and cred
+me.mod_cc("Heat", +newheat)
+me.mod_cc("Street Cred", +newcred)
+#builds bottom portion of return string
+returnstr += f' -f "**Getting Paid** | Your coin pouch went from: \n' \
+    f'`{str(opp)}` => `{str(opp+npp)}` pp \n' \
+    f'`{str(ogp)}` => `{str(ogp+ngp)}` gp \n' \
+    f'`{str(osp)}` => `{str(osp+nsp)}` sp \n' \
+    f'`{str(ocp)}` => `{str(ocp+ncp)}` cp \n' \
+    f'Current Heat: `{me.cc_str("Heat") if me.cc_exists("Heat") else " " }` \n' \
+    f'Current Street Cred: `{me.cc_str("Street Cred") if me.cc_exists("Street Cred") else ""}` \n' \
+    f'DT Remaining: `{me.mod_cc("DT Slot",-2)}{me.cc_str("DT Slot")}`"' \
+    f' -footer "!help dt adult    |  v5 by by mrrobinhood5#1999"' \
+    f' -title "{name}: {title}"'
+return returnstr
 </drac2>
--f """**Getting Paid** | Your coin pouch went from:
-`{{str(oldpp)}}` => `{{str(newpp)}}` pp
-`{{str(oldgp)}}` => `{{str(newgp)}}` gp
-`{{str(oldsp)}}` => `{{str(newsp)}}` sp
-`{{str(oldcp)}}` => `{{str(newcp)}}` cp
-
-Current Heat: `{{cc_str("Heat") if cc_exists("Heat") else " " }}`
-Current Street Cred: `{{cc_str("Street Cred") if cc_exists("Street Cred") else ""}}`
-DT Remaining: `{{mod_cc("DT Slot",-2)}}{{cc_str("DT Slot")}}`
-"""
--footer """!help dt adult    |  v4 by by mrrobinhood5#1999"""
