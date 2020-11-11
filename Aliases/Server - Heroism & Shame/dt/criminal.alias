@@ -1,8 +1,12 @@
 tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -color <color> -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
 <drac2>
+# Written by MrRobinhood5#1999
 #sets primary variables
-pargs, returnstr, me, isObservant, passRoll=argparse(&ARGS&),  f'', character(), False if "Observant" not in feats else True, "10"
-usingPassive, passiveAdv, observantBonus = True if pargs.get("passive") else False, "" if not pargs.get("iadv") else "+5[advantage]", "" if not isObservant else "+5[observant]"
+pargs, returnstr, me, hasFeats, passRoll=argparse(&ARGS&),  f'', character(), False if not exists("feats") else True, "10"
+usingPassive, passiveAdv = True if pargs.get("passive") else False, "" if not pargs.get("iadv") \
+  else "+5[advantage]"
+isObservant = True if hasFeats and "Observant" in feats else False
+observantBonus = "" if not isObservant else "+5[observant]"
 #set all rolls
 defroll,advroll,ratgp,middlegp,modestgp,noblegp= "1d20+","2d20kh1+","1d4+1","1d6+10","1d8+30","1d10+100"
 #set all counters
