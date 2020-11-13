@@ -1,0 +1,23 @@
+embed -title "Thieve's Embodiment - <name>"
+<drac2>
+# variables
+dt_cc = 'DT Slot'
+training_cc = 'Embodiment Training'
+dc, days = 15, 40
+args = &ARGS&
+pargs = argparse(&ARGS&)
+ch = character()
+help_str = f'See {ctx.prefix}PLACEHOLDER for help.'
+</drac2>
+<drac2>
+# setup
+ch.create_cc_nx(dt_cc, 0, 2, dispType='bubble')
+ch.create_cc_nx(training_cc, 0, days)
+if len(args) < 3:
+	err('Not enough arguments provided - '+help_str)
+date, raw_skill, training = args[:3]
+</drac2>
+<drac2>
+# roll
+</drac2>
+-thumb <image> -color <color>
