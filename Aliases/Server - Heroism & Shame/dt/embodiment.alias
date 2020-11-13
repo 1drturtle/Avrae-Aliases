@@ -19,5 +19,12 @@ date, raw_skill, training = args[:3]
 </drac2>
 <drac2>
 # roll
+adv = pargs.adv()
+
+roll_str = ['1d20', '2d20kh1', '2d20kl1'][adv]
+
+bonuses = ('+'+args.join('+', 'b')) if args.get('b') else ''
+
+roll_str += bonuses
 </drac2>
 -thumb <image> -color <color>
