@@ -1,5 +1,6 @@
 embed -title "Thieve's Embodiment - <name>"
 <drac2>
+# Created by Dr Turtle#1771
 # variables
 dt_cc = 'DT Slot'
 training_cc = 'Embodiment Training'
