@@ -78,3 +78,4 @@ Result|You **{{'passed' if cc_mod >= 1 else 'failed'}}** the DC {{dc}}!
 Training Progress: {{total}}/{{days}} {{f'({cc_mod:+})' if cc_mod != 0 else ''}}{{crit_string if crit != 0 else ''}}{{f'\nYou finished training {to_train}!' if done else ''}}
 """
 -thumb <image> -color <color>
+-footer "!dt embodiment (date) (training) (skill) | Dr Turtle#1771"
