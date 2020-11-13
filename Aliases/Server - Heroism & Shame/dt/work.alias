@@ -56,7 +56,7 @@ for x in rolls:
     else:
         coins = 1
     total_gp += coins
-    final_string += '-f "Roll #'+str(current_roll)+'|'+str(x)+'\nCoins: '+str(coins)+'  gp"\n'
+    final_string += '-f "Roll #'+str(current_roll)+'|'+str(x)+'\nCoins: '+str(coins)+'  gp|inline"\n'
 final_string += '-f "Total Coins: '+str(total_gp)+' gp"\n'
 # Add coins to bag
 bags_before = load_json(get('bags', 0))
