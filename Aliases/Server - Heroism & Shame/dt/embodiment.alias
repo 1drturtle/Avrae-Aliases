@@ -58,7 +58,7 @@ ch.mod_cc(training_cc, cc_mod)
 ch.mod_cc(dt_cc, -2)
 total = ch.get_cc(training_cc)
 
-# if done - 
+# if done
 done = False
 if ch.get_cc(training_cc) == days:
 	ch.set_cc(training_cc, 0)
