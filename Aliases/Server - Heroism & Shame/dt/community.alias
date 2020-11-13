@@ -1,6 +1,6 @@
 tembed -title "Downtime: Community Service" -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
 <drac2>
-# Written By: MrRobinhood5#1999
+# Written and Directed By: MrRobinhood5#1999
 
 calendar=load_json(get_gvar("1aec09a0-9e25-4700-9c2d-42d79cb0163b"))
 hourOffset=calendar.get('hourOffset',0)+int(get('timezone',0))
