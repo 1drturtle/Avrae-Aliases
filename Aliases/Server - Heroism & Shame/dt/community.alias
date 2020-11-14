@@ -1,6 +1,7 @@
 tembed -title "Downtime: Community Service" -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
 <drac2>
-# Written By: MrRobinhood5#1999
+# Written and Directed By: MrRobinhood5#1999
+
 calendar=load_json(get_gvar("1aec09a0-9e25-4700-9c2d-42d79cb0163b"))
 hourOffset=calendar.get('hourOffset',0)+int(get('timezone',0))
 baseYear=calendar.get("yearOffset",1970)
@@ -61,7 +62,7 @@ gotHeat = True if hasHeat and character().get_cc(h) > int(pHeat) else False
 returnstr += f'but gained Heat! Community Points reset to `0`, ' if gotHeat else f''
 me.set_cc(cp, 0) if gotHeat else 0
 me.set_cvar(ph, me.get_cc(h))
-if hasHeat and me.get_cc(h) >= 5:
+if hasHeat and me.get_cc(h) > 5:
   return f' -f "WARNING|You **CANNOT** do Community Service with more than 5 Heat. Bye"'
 returnstr += f'nice."\n '
 roll1mod = str((me.skills.performance.value-me.skills.charisma.value)+me.skills.constitution.value)

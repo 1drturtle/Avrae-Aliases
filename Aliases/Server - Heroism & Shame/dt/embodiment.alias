@@ -1,0 +1,81 @@
+embed -title "Thieve's Embodiment - <name>"
+<drac2>
+# Created by Dr Turtle#1771
+# variables
+dt_cc = 'DT Slot'
+training_cc = 'Embodiment Training'
+dc, days = 15, 40
+args = &ARGS&
+pargs = argparse(&ARGS&)
+ch = character()
+help_str = f'See {ctx.prefix}PLACEHOLDER for help.'
+</drac2>
+<drac2>
+# setup
+ch.create_cc_nx(dt_cc, 0, 2, dispType='bubble')
+ch.create_cc_nx(training_cc, 0, days)
+if ch.get_cc(training_cc) == days:
+	ch.set_cc(training_cc, 0)
+if len(args) < 3:
+	err('Not enough arguments provided - '+help_str)
+date, to_train, raw_skill = args[:3]
+</drac2>
+<drac2>
+# select skill
+ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+skill = ([x for x in ABILITIES if raw_skill.lower() in x]+[None])[0]
+if skill is None:
+	err('Invalid Skill Provided - '+help_str)
+skill = (ch.skills[skill], skill.title())
+</drac2>
+<drac2>
+# roll
+
+roll_str = skill[0].d20(base_adv=pargs.adv(boolwise=True))
+
+bonuses = ('+'+pargs.join('b', '+')) if pargs.get('b') else ''
+
+roll_str += bonuses
+
+result = vroll(roll_str)
+crit = result.result.crit
+succeed = result.total >= dc
+</drac2>
+<drac2>
+# Calculate results
+cc_mod = 0
+if succeed:
+	if not crit == -1:
+		cc_mod += 1
+	if crit == 1:
+		cc_mod += 1
+if crit == 2:
+	cc_mod = -1
+crit_string = f' (**Crit {"success" if crit == 1 else "failure"}!)**'
+</drac2>
+<drac2>
+# apply results - 
+ch.mod_cc(training_cc, cc_mod)
+ch.mod_cc(dt_cc, -2)
+total = ch.get_cc(training_cc)
+
+# if done
+done = False
+if ch.get_cc(training_cc) == days:
+	ch.set_cc(training_cc, 0)
+	done = True
+</drac2>
+-desc """
+**Character:** <name>
+**Date:** {{date}}
+**Training:** {{to_train}}
+**Checking:** {{skill[1]}}
+**Rolled:** {{str(result)}}
+**Remaining DT slots:** {{ch.cc_str(dt_cc)}}
+"""
+-f """
+Result|You **{{'passed' if cc_mod >= 1 else 'failed'}}** the DC {{dc}}!
+Training Progress: {{total}}/{{days}} {{f'({cc_mod:+})' if cc_mod != 0 else ''}}{{crit_string if crit != 0 else ''}}{{f'\nYou finished training {to_train}!' if done else ''}}
+"""
+-thumb <image> -color <color>
+-footer "!dt embodiment (date) (training) (skill) | Dr Turtle#1771"
