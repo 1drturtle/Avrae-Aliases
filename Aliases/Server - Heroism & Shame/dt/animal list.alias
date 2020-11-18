@@ -1,0 +1,19 @@
+embed -thumb <image> -color <color>
+<drac2>
+pargs, returnstr, me = argparse(&ARGS&), "", character()
+if not exists("DTAnimalTrain") or DTAnimalTrain == {}:
+  return  f' -title "{me.name} attemps to check their saved animals" -desc "But there are NONE!" '\
+          f' -f "Fix| Run `!dt animal setup` to save your animals." '
+else:
+  savedAnimals = load_json(DTAnimalTrain)
+returnstr += f' -title "{me.name} checks their saved Animals"'
+for animal, data in savedAnimals.items():
+    ccName = "Animal Training-"+animal
+    returnstr += f' -f "{animal}| Name: `{data["name"]}` \n' \
+                 f' Current Level: `{data["traininglevel"]}` \n '
+    if data["traininglevel"] == "drilled":
+        returnstr += f' Train Progress: `COMPLETE!`" '
+    else:
+        returnstr += f' Train Progress: {me.cc_str(ccName)}" '
+return returnstr
+</drac2>

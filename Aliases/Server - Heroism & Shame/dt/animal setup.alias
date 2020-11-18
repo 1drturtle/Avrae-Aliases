@@ -1,4 +1,4 @@
-embed -footer "Usage - !dt animal setup -animal \"type\" -cr # [-name \"name\"] [-train tamed/trained]"
+embed -thumb <image> -color <color> -footer "Usage - !dt animal setup -animal \"type\" -cr # [-name \"name\"] [-train tamed/trained]"
 <drac2>
 # sets primary variables
 me, pargs, returnstr = character(), argparse(&ARGS&), ""
@@ -31,7 +31,7 @@ if cr not in crCheck:
     if int(cr) not in range(0,31):
         return setupstr
 else:
-    cr = 1
+    cr = "1"
 
 
 #checks if you can train the animal
@@ -59,6 +59,6 @@ me.set_cc(f'Animal Training-{animal}', "0")
 setupAnimal.update({animal:{"name": animalName, "cr":cr,"traininglevel":currentLevel, "dc":trainDC}})
 me.set_cvar("DTAnimalTrain", dump_json(setupAnimal))
 returnstr += f' -f "Setup Complete|You will be training `{animalName}` the `{animal}` for `{daysToTrain}` days with a DC `{trainDC}` \n'\
-             f'Begin training with `!dt animal {animal}`" '
+             f'Begin training with `!dt animal -name {animal}`" '
 return returnstr
 </drac2>
