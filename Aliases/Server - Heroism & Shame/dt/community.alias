@@ -1,4 +1,4 @@
-tembed -title "Downtime: Community Service" -thumb <image> -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
+tembed -title "Downtime: Community Service" -thumb <image> -color <color> -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
 <drac2>
 # Written and Directed By: MrRobinhood5#1999
 

@@ -4,15 +4,14 @@ embed -thumb <image> -color <color> -footer "Usage - !dt animal -name \"name\" [
 me, pargs, returnstr, trainComplete, trainCounter = character(), argparse(&ARGS&), "", False, 0
 
 # sets the booleans
-withAdv = True if pargs.get("adv") else False
 hasAnimal = True if exists("DTAnimalTrain") else False
 choseAnimal = True if pargs.get("name") else False
 
 # sets roll string
-rollStr = "1d20+" if not withAdv else "2d20kh1+"
+rollStr = ['1d20+', '2d20kh1+', '2d20kl1+'][pargs.adv()]
 rollStr += str(me.skills.animalHandling.value)
 # sets the repeats
-repeats = int(pargs.get("rr")[0]) if pargs.get("rr") else 1
+repeats = int(pargs.last("rr")) if pargs.get("rr") else 1
 
 # sets the error strings
 errorstr = f' -title "{me.name} attempts to do Animal Training"' \
@@ -24,7 +23,7 @@ if not hasAnimal:
 elif not choseAnimal:
     return errorstr
 else:
-    chosenAnimal = pargs.get("name")[0]
+    chosenAnimal = pargs.last("name")
 
 #load the cvar
 animalList = load_json(DTAnimalTrain)

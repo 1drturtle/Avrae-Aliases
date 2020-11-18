@@ -22,9 +22,9 @@ setupstr = f' -title "{{name}} must setup their animal training" '\
 # Error Checks missing things before running the setup
 if not choseAnimal or not choseCR:
     return setupstr
-if hasPrevTraining and pargs.get("train")[0] not in ["tamed", "trained"]:
+if hasPrevTraining and pargs.last("train") not in ["tamed", "trained"]:
     return setupstr
-animal, animalName, cr = pargs.get("animal")[0].lower(),pargs.get("name")[0] if setName else "nameless", pargs.get("cr")[0],
+animal, animalName, cr = pargs.last("animal").lower(),pargs.last("name") if setName else "nameless", pargs.last("cr")
 if cr not in crCheck:
     if "/" in cr:
         return setupstr
@@ -40,7 +40,7 @@ if canTrain == False:
     return f' -title "{me.name} attempts Animal Train Setup" -f "Oops|You can\'t train that animal at your level. Darnit." '
 #checks and sets your current animal training level
 if hasPrevTraining:
-    currentLevel = pargs.get("train")[0]
+    currentLevel = pargs.last("train")
 else :
     currentLevel = "none"
 
