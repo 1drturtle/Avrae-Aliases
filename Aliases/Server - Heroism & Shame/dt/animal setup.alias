@@ -1,0 +1,64 @@
+embed -thumb <image> -color <color> -footer "Usage - !dt animal setup -animal \"type\" -cr # [-name \"name\"] [-train tamed/trained]"
+<drac2>
+# sets primary variables
+me, pargs, returnstr = character(), argparse(&ARGS&), ""
+# sets secondary variables
+hasPrevTraining = True if pargs.get("train") else False
+choseAnimal = True if pargs.get("animal") else False
+setName = True if pargs.get("name") else False
+choseCR = True if pargs.get("cr") else False
+crCheck = ["1/8","1/4","1/2"]
+hasCVAR = True if exists("DTAnimalTrain") else False
+
+# default error string
+setupstr = f' -title "{{name}} must setup their animal training" '\
+           f' -desc "!dt animal setup" '\
+           f' -f "-animal|Type in the type of animal you are about to train. This can be \\"monkey\\" or \\"constrictor boa\\"." '\
+           f' -f "-cr|No quotes, this is the number of the CR. 1/2 or 2 or whatever" '\
+           f' -f "-name|*Optional* - This can be the name of the Animal if you have a name. Use quotes for names with spaces" '\
+           f' -f "-train|*Optional* - Either tamed or trained, if the animal has already had previous training or you bought it tamed." '\
+           f' -f "WARNING|Running this command after starting training will reset your training counters for that animal" '
+
+# Error Checks missing things before running the setup
+if not choseAnimal or not choseCR:
+    return setupstr
+if hasPrevTraining and pargs.last("train") not in ["tamed", "trained"]:
+    return setupstr
+animal, animalName, cr = pargs.last("animal").lower(),pargs.last("name") if setName else "nameless", pargs.last("cr")
+if cr not in crCheck:
+    if "/" in cr:
+        return setupstr
+    if int(cr) not in range(0,31):
+        return setupstr
+else:
+    cr = "1"
+
+
+#checks if you can train the animal
+canTrain = True if int(cr) <= floor(me.levels.total_level/2) else False
+if canTrain == False:
+    return f' -title "{me.name} attempts Animal Train Setup" -f "Oops|You can\'t train that animal at your level. Darnit." '
+#checks and sets your current animal training level
+if hasPrevTraining:
+    currentLevel = pargs.last("train")
+else :
+    currentLevel = "none"
+
+# if you end up with a trainable creature and nothing triggers errors
+if not hasCVAR:
+    me.set_cvar("DTAnimalTrain", {})
+setupAnimal = load_json(DTAnimalTrain)
+
+#builds the Custom Counters
+daysToTrain = int(cr) * 10
+trainDC = 14+int(cr) if currentLevel == "trained" else 12+int(cr) if currentLevel == "tamed" else 10+int(cr)
+me.create_cc(f'Animal Training-{animal}', "0", f'{daysToTrain}', "none",desc=f'Trained Level: {currentLevel}')
+me.set_cc(f'Animal Training-{animal}', "0")
+
+#
+setupAnimal.update({animal:{"name": animalName, "cr":cr,"traininglevel":currentLevel, "dc":trainDC}})
+me.set_cvar("DTAnimalTrain", dump_json(setupAnimal))
+returnstr += f' -f "Setup Complete|You will be training `{animalName}` the `{animal}` for `{daysToTrain}` days with a DC `{trainDC}` \n'\
+             f'Begin training with `!dt animal -name {animal}`" '
+return returnstr
+</drac2>

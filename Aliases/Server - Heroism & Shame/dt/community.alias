@@ -1,4 +1,4 @@
-tembed -title "Downtime: Community Service" -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
+tembed -title "Downtime: Community Service" -thumb <image> -color <color> -footer "!help dt community | by MrRobinhood5#1999" {{pargs=&ARGS&}}
 <drac2>
 # Written and Directed By: MrRobinhood5#1999
 
@@ -30,7 +30,7 @@ if pargs.get("rr"):
   repeat = 2 if int(pargs.get("rr")[0]) >= 2 else 1
 else:
   repeat = 1
-returnstr = f' -desc "Using {repeat} Downtime for {timestamp}" \n -f "Stats| '
+returnstr = f' -desc "{me.name} using {repeat} Downtime for {timestamp}" \n -f "Stats| '
 if exists("Tag"):
   isTag = True
   tagInfo = load_json(Tag)

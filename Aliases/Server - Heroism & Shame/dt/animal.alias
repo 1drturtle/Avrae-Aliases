@@ -1,0 +1,100 @@
+embed -thumb <image> -color <color> -footer "Usage - !dt animal -name \"name\" [adv] [-rr #]"
+<drac2>
+# sets primary variables
+me, pargs, returnstr, trainComplete, trainCounter = character(), argparse(&ARGS&), "", False, 0
+
+# sets the booleans
+hasAnimal = True if exists("DTAnimalTrain") else False
+choseAnimal = True if pargs.get("name") else False
+
+# sets roll string
+rollStr = ['1d20+', '2d20kh1+', '2d20kl1+'][pargs.adv()]
+rollStr += str(me.skills.animalHandling.value)
+# sets the repeats
+repeats = int(pargs.last("rr")) if pargs.get("rr") else 1
+
+# sets the error strings
+errorstr = f' -title "{me.name} attempts to do Animal Training"' \
+           f' -f "ERROR | Animal not set up, or you didn\'t use `-name \"name\"`. Go do `!dt animal setup` or spell it right"' \
+
+# does the error checking
+if not hasAnimal:
+    return errorstr
+elif not choseAnimal:
+    return errorstr
+else:
+    chosenAnimal = pargs.last("name")
+
+#load the cvar
+animalList = load_json(DTAnimalTrain)
+
+#checks to see if the passed animal is there
+if chosenAnimal not in animalList.keys():
+    for aname, ainfo in animalList.items():
+        if chosenAnimal in ainfo.values():
+            myAnimal = animalList[aname]
+            chosenAnimal = aname
+            break
+else:
+    myAnimal = animalList[chosenAnimal]
+if not exists("myAnimal"):
+    return errorstr
+ccName, currentLevel, dc= f'Animal Training-{chosenAnimal}', myAnimal["traininglevel"], myAnimal["dc"]
+nextLevel = currentLevel
+returnstr += f' -title "{me.name} trains {myAnimal["name"]}" -desc "Current trained level: `{currentLevel}`" '
+#errors checks to see if there is no more training to be done
+if myAnimal["traininglevel"] == "drilled":
+    returnstr += f' -f "COMPLETE| **ALL** Training Complete, No more need to train {myAnimal["name"]}."'
+    return returnstr
+# runs the training portion
+for x in range(repeats):
+    # first checks to see if the CC has been completed, otherwise, wont roll
+    if me.cc(ccName).value >= me.cc(ccName).max or trainComplete:
+        returnstr += f' -f "COMPLETE| Training Complete, will not roll anymore."'
+        trainComplete = True
+        break
+    #builds the roll and checks to see if it passed
+    animalroll = vroll(rollStr)
+    crit = animalroll.result.crit
+    critstr = "Fail"
+    passedRoll = animalroll.total >= dc
+    if passedRoll and not trainComplete:
+        if not crit == -1:
+            trainCounter += 1
+            me.mod_cc(ccName, 1)
+            critstr = f' Success +1 '
+        if crit == 1:
+            trainCounter += 1
+            me.mod_cc(ccName, 1)
+            critstr = f' **Crit Success +2** '
+
+        # check to see if the increment put you at max
+        if me.cc(ccName).value >= me.cc(ccName).max:
+            #if you met the max then change it to the next level and mark completion
+            nextLevel = "tamed" if currentLevel == "none" else "trained" if currentLevel == "tamed" \
+            else "drilled" if currentLevel == "trained" else currentLevel
+            myAnimal.update({currentLevel+"completion":True, "traininglevel":nextLevel, "dc":dc+2})
+            if nextLevel != "drilled":
+                me.create_cc(ccName, "0", f'{int(myAnimal["cr"])*10}', "none",
+                             desc=f'Trained Level: {nextLevel}')
+                me.set_cc(ccName, "0")
+            trainComplete = True
+    if not passedRoll and not trainComplete:
+        if crit == 2:
+            trainCounter -= 1
+            # trainCounter = 0 if trainCounter < 0 else trainCounter
+            me.mod_cc(ccName, -1)
+            critstr = f' **Crit Failure -1** '
+
+    # builds the iteration string
+    returnstr += f' -f "Attempt #{x+1}|DC: {dc}\n{animalroll.full}\n{critstr}|inline"'
+# updates the CVAR
+animalList[chosenAnimal].update(myAnimal)
+me.set_cvar("DTAnimalTrain", dump_json(animalList))
+# adds the Summary
+returnstr += f' -f "Summary|{myAnimal["name"]} is at the `{nextLevel}` training Level\n ' \
+             f' {me.cc_str(ccName)} (+{trainCounter})" '
+if nextLevel == "drilled":
+    me.delete_cc(ccName)
+return returnstr
+</drac2>

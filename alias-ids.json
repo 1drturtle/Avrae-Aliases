@@ -19,5 +19,9 @@
 	"Aliases/Server - Heroism & Shame/thaumaturgy.alias": "5f832c57bbee1bca82ad302f",
 	"Aliases/Server - Heroism & Shame/feats/featcreate.alias": "5f8c8aa9f2d59b2718721eb4",
 	"Aliases/Server - Heroism & Shame/feats/featdelete.alias": "5f8c8dbfbbee1bca82ad3a49",
-	"Aliases/Server - Heroism & Shame/feats/featlookup.alias": "5f8c8a6df2d59b2718721eb3"
+	"Aliases/Server - Heroism & Shame/feats/featlookup.alias": "5f8c8a6df2d59b2718721eb3",
+	"Aliases/Server - Heroism & Shame/dt/animal.alias": "5fb4a5ab7e4b0daea5b60d2d",
+	"Aliases/Server - Heroism & Shame/dt/animal list.alias": "5fb4a5de0cae0e98f6337e6d",
+	"Aliases/Server - Heroism & Shame/dt/animal setup.alias": "5fb4a6460cae0e98f6337e6e"
+
 }
