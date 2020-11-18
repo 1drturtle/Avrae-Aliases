@@ -30,7 +30,7 @@ if pargs.get("rr"):
   repeat = 2 if int(pargs.get("rr")[0]) >= 2 else 1
 else:
   repeat = 1
-returnstr = f' -desc "{name} using {repeat} Downtime for {timestamp}" \n -f "Stats| '
+returnstr = f' -desc "{me.name} using {repeat} Downtime for {timestamp}" \n -f "Stats| '
 if exists("Tag"):
   isTag = True
   tagInfo = load_json(Tag)
