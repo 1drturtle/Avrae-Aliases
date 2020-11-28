@@ -1,4 +1,4 @@
-tembed -title "{{name}} Crime Fights" {{pargs=&ARGS&}}
+tembed -title "{{name}} Crime Fights" {{pargs=&ARGS&}} -thumb <image> -color <color>
 <drac2>
 # Written By: MrRobinhood5#1999
 

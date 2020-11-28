@@ -1,0 +1,40 @@
+!alias hpcheck embed -title "HP Checker" -thumb <image> -color <color>
+<drac2>
+args = argparse(&ARGS&)
+hd = args.get('hd')
+if not hd:
+    err('Missing Hitdice. Usage - `!hpcheck <-hd 3d8> [-b #]`')
+conarg = args.get('con')
+conMod = int(conarg[0]) if conarg and conarg[0].isdigit else constitutionMod
+</drac2>
+<drac2>
+averages = {
+    '6': 4,
+    '8': 5,
+    '10': 6,
+    '12': 7
+}
+total = 0
+# assuming first arg is main class
+for dice in hd:
+    item = dice.split('d')
+    iterations = int(item[0]) if item[0].isdigit() else err('Invalid Hitdice')
+    value = int(item[1]) if item[1].isdigit() else err('Invalid Hitdice')
+    for i in range(iterations):
+        if total == 0:
+            total += (value + conMod)
+            continue
+        total += (averages[item[1]] + conMod)
+if args.get('b'):
+    total += sum([int(bonus) for bonus in args.get('b') if bonus.isdigit()])
+if total != hp:
+    test = False
+else:
+    test = True
+ignore = args.last('i') and str(ctx.author.id) in load_json(get_svar('featsAuthorized', '[]'))
+</drac2>
+-desc "This tool compares your maximum hitpoint total to the amount you should have. For any bonuses, add `-b #`."
+{{f'-f "Current Max HP|{hp}"' if not ignore else ''}}
+-f "Calculated Max HP ({{'+'.join(hd)}}+{{conMod*level}})|{{total}}"
+{{f'''-f "Equality|{'HP matches.' if test else f'HP does not match! Delta: {total-hp}'}"''' if not ignore else ''}}
+-footer "!hpcheck [-hd xdx] (-con x) (-b x) (-i) | Dr Turtle#1771"
