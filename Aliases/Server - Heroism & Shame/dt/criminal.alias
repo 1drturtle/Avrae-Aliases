@@ -1,4 +1,4 @@
-tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -color <color> -footer "!dt criminal [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
+tembed -title "{{name}}: Criminal Downtime" -desc "Requires 2 Downtime Slots" -thumb <image> -color <color> -footer "!dt crime [withhelp] [iadv] [badv] [padv] [-ib X] [-bb X] [-pb X][-rr X] [passive]"
 <drac2>
 # Written by MrRobinhood5#1999
 #sets primary variables
@@ -99,6 +99,9 @@ nsp = (coincount - ngp)*10
 ncp = int((nsp-int(nsp))*10)
 nsp = int(nsp)
 bagsLoaded=load_json(bags) #load the bags
+# Error check for Coin Pouch
+if "Coin Pouch" not in str(bagsLoaded):
+  return f' -f "Error|You do NOT have a coin pouch. Go make one with `!coins` and come back to crime." -t 120'
 pouch=([x for x in bagsLoaded if x[0]=="Coin Pouch"])[0] #load the coinpouch
 ogp = pouch[1]['gp'] # what gp was before?
 pouch[1].update({'gp':pouch[1]['gp']+ngp, 'sp':pouch[1]['sp']+nsp, 'cp':pouch[1]['cp']+ncp}) #updates new quantities locally
