@@ -1,0 +1,99 @@
+embed <drac2>
+# Variables
+ch     = character()
+skills = ch.skills
+args   = argparse(&ARGS&)
+# Error before we do anything
+if not get('bags'):
+	err('You do not have bags setup. Run `!coins`.')
+bags = load_json(get('bags', '[]'))
+coin_pouch, coin_pouch_index = ([(x, i) for i, x in enumerate(bags) if x[0] == 'Coin Pouch']+[(None, None)])[0]
+if coin_pouch is None:
+	err('You do not have a coin pouch. Run `!coins`.')
+# Setup the rolls
+roll_choices = ['1d20', '2d20kh1', '2d20kl1']
+custom_one   = {
+	'adv': 'dadv',
+	'dis': 'ddis'
+}
+display_adv = args.adv(custom=custom_one)
+display_bonus = args.join('db', '+')
+display_roll = roll_choices[display_adv] + f'+{max(skills.athletics.value, skills.performance.value)}' + ('+'+display_bonus if args.get('db') else '')
+
+custom_two   = {
+	'adv': 'eadv',
+	'dis': 'edis'
+}
+endurance_adv = args.adv(custom=custom_one)
+endurance_bonus = args.join('eb', '+')
+endurance_roll = roll_choices[endurance_adv]
+endurance_roll += f'+{skills.constitution.value+(proficiencyBonus*skills.athletics.prof)}'
+endurance_roll += f'+{endurance_bonus}' if args.get('eb') else ''
+
+custom_three = {
+	'adv': 'cadv',
+	'dis': 'cdis'
+}
+crowd_adv = args.adv(custom=custom_one)
+crowd_bonus = args.join('cb', '+')
+crowd_roll = roll_choices[crowd_adv]
+crowd_cha = max(skills.intimidation.value, skills.persuasion.value)
+crowd_str = max(skills.strength.value+(proficiencyBonus*skills.intimidation.prof), skills.strength.value+(proficiencyBonus*skills.persuasion.prof))
+crowd_roll += f'+{max(crowd_str, crowd_cha)}' + (f'+{crowd_bonus}' if args.get('cb') else '')
+
+# Roll the Checks
+display_check = vroll(display_roll)
+endurance_check = vroll(endurance_roll)
+crowd_check = vroll(crowd_roll)
+
+# Do the math
+xp, coins, successes = 200, 0, 0
+lingering = False
+if display_check.total >= 15:
+	successes += 1
+if endurance_check.total >= 20:
+	successes += 1
+	xp += 100 if endurance_check.total > 20 else 0
+else:
+	lingering = True
+	injuries = [
+	'You had a long day of pushing yourself beyond your limit. You gain 2 levels of exhaustion `!exhaust 2`',
+	'You took a large hit to the head that caused your head to spin. You have disadvantage on all mental saving throws and checks until you Recuperate.',
+	'You shouldn\'t have skipped stretching. You take disadvantage on all Dexterity and Strength Saving throws until you Recuperate.',
+	'Your wound was healed on the surface, but not below. You take 5d6 piercing damage after every long rest until you Recuperate.'
+	]
+	injury_roll = vroll('1d4')
+	ch.create_cc('Lingering Injury', 0, 7, desc=injuries[injury_roll.total - 1])
+if crowd_check.total >= 15:
+	successes += 1
+	coins += 50 if crowd_check.total > 15 else 0
+
+coins += [0, 110, 200, 300][successes]
+prev_gp = coin_pouch[1].gp
+coin_pouch[1]['gp'] += coins
+bags[coin_pouch_index] = coin_pouch
+set_cvar('bags', dump_json(bags))
+
+rolls_str = f'-f "Rolls|\n' \
+	   f'**Display Check:** {str(display_check)} {"Success!" if display_check.total >= 15 else "Fail!"}\n' \
+	   f'**Endurance Check:** {str(endurance_check)} {"Success!" if endurance_check.total >= 20 else "Fail!"}\n' \
+	   f'**Crowd Check:** {str(crowd_check)} {"Success!" if crowd_check.total >= 15 else "Fail!"}"'
+result_str = f'-f "Result|\n' \
+             f'Successes: {successes}\n' \
+             f'Coins: `{prev_gp}` -> `{prev_gp + coins}` gp (`{coins:+}`)\n' \
+             f'XP: `{xp}`"'
+lingering_str = ''
+if lingering:
+	lingering_str = f'-f "Lingering Injury!|' \
+					f'You failed your endurance check, and got a lingering injury!\n' \
+					f'**Injury Roll:** {injury_roll}\n' \
+					f'**Injury:** {injuries[injury_roll.total - 1]}"\n' \
+					f'-f "CC Created|Lingering Injury ({ch.cc_str("Lingering Injury")})"'
+</drac2>
+{{rolls_str}}
+{{result_str}}
+{{lingering_str}}
+-title "Downtime Activity: Pit Fighting"
+-desc "Requires 2 DT Slots. Does not automatically add XP."
+-thumb <image> -color <color>
+-footer "{{ctx.prefix}}help dt pitfight | Dr Turtle#1771"

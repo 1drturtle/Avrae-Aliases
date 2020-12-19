@@ -22,6 +22,8 @@
 	"Aliases/Server - Heroism & Shame/feats/featlookup.alias": "5f8c8a6df2d59b2718721eb3",
 	"Aliases/Server - Heroism & Shame/dt/animal.alias": "5fb4a5ab7e4b0daea5b60d2d",
 	"Aliases/Server - Heroism & Shame/dt/animal list.alias": "5fb4a5de0cae0e98f6337e6d",
-	"Aliases/Server - Heroism & Shame/dt/animal setup.alias": "5fb4a6460cae0e98f6337e6e"
+	"Aliases/Server - Heroism & Shame/dt/animal setup.alias": "5fb4a6460cae0e98f6337e6e",
+	"Aliases/Server - Heroism & Shame/pitfight/pitfight.alias": "5f8c8a19bbee1bca82ad3a3e",
+	"Aliases/Server - Heroism & Shame/pitfight/pitfightrest.alias": "5f8c8a25bbee1bca82ad3a3f"
 
 }
