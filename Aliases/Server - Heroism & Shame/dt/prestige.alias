@@ -1,14 +1,14 @@
-embed -title "Thieve's Embodiment - <name>"
+embed -title "Downtime Activity: Prestige Feat"
 <drac2>
 # Created by Dr Turtle#1771
 # variables
 dt_cc = 'DT Slot'
-training_cc = 'Embodiment Training'
+training_cc = 'Prestige Feat Training'
 dc, days = 15, 40
 args = &ARGS&
 pargs = argparse(&ARGS&)
 ch = character()
-help_str = f'See {ctx.prefix}help dt embodiment for help.'
+help_str = f'See {ctx.prefix}help dt prestige for help.'
 </drac2>
 <drac2>
 # setup
@@ -45,8 +45,7 @@ succeed = result.total >= dc
 # Calculate results
 cc_mod = 0
 if succeed:
-	if not crit == -1:
-		cc_mod += 1
+	cc_mod += 1
 	if crit == 1:
 		cc_mod += 1
 if crit == 2:
@@ -78,4 +77,4 @@ Result|You **{{'passed' if cc_mod >= 1 else 'failed'}}** the DC {{dc}}!
 Training Progress: {{total}}/{{days}} {{f'({cc_mod:+})' if cc_mod != 0 else ''}}{{crit_string if crit != 0 else ''}}{{f'\nYou finished training {to_train}!' if done else ''}}
 """
 -thumb <image> -color <color>
--footer "!dt embodiment (date) (training) (skill) | Dr Turtle#1771"
+-footer "!dt prestige (date) (training) (skill) | Dr Turtle#1771"
