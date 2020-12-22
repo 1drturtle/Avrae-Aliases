@@ -55,7 +55,7 @@ crit_string = f' (**Crit {"success" if crit == 1 else "failure"}!)**'
 <drac2>
 # apply results - 
 ch.mod_cc(training_cc, cc_mod)
-ch.mod_cc(dt_cc, -2)
+ch.mod_cc(dt_cc, -1)
 total = ch.get_cc(training_cc)
 
 # if done
