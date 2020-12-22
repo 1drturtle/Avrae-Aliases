@@ -1,15 +1,12 @@
-!alias ccbase embed <drac2>
-c=character()
-description="You can heighten your echo’s fury. Whenever you take the Attack action, you can make one additional melee attack from the echo’s position."
-description_if_out="You must take a long rest before you can use this ability."
-cc_name,cc_min,cc_max,cc_reset,cc_type='Unleash Incarnation', 0, constitutionMod, 'long', 'bubble'
-c.create_cc_nx(cc_name, cc_min, cc_max, cc_reset, cc_type)
-if c.get_cc(cc_name) > 0:
-	work = True
-	c.mod_cc(cc_name, -1)
+embed <drac2>
+ch = character()
+cc_name = 'Unleash Incarnation'
+v = ch.cc_exists(cc_name) and ch.get_cc(cc_name)
+none_str = '*None*'
+if v:
+	ch.mod_cc(cc_name, -1)
+	return f'-title "{name} heightens their echo\'s fury with Unleash Incarnation!" -desc "You can heighten your echo’s fury. Whenever you take the Attack action, you can make one additional melee attack from the echo’s position." -f "Remaining Incarnations|{ch.cc_str(cc_name)} (-1)"'
 else:
-	work = False
+	return f'-title "{name} tries to use Unleash Incarnation!" -desc "You must take a long rest before you can use this ability again." -f "{cc_name}|{ch.cc_str(cc_name) if ch.cc_exists(cc_name) else none_str}"'
 </drac2>
--desc "{{description if work else description_if_out}}"
--f "{{cc_name}}|{{c.cc_str(cc_name)}}{{' (-1)' if work else None}}"
--title {{f"{name} uses Unleash Incarnation!" if work else f'{name} cannot use Unleash Incarnation!'}}
+-thumb <image> -color <color>
