@@ -16,7 +16,7 @@ searchbonus, searchskill, seductbonus, seductskill, perfconbonus = invetup[1] if
 
 # checks for guidance and adds it
 if "guidance" in me.spellbook:
-    searchbonus += "+1d4[guidance]"
+    searchbonus = str(searchbonus)+"+1d4[guidance]"
 else:
     pass
 
