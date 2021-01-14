@@ -5,7 +5,7 @@ tembed -thumb <image> -color <color>
 pargs, title, returnstr, newheat, newcred = argparse(&ARGS&), load_json(get_gvar("48729b0f-c54a-4a33-b2ca-ff6c92b19700"))[vroll('1d400').total-1].thing, "", 0, 0
 pp, gp, sp, cp, npp, ngp, nsp, ncp = 0, 0, 0, 0, 0, 0, 0, 0
 # loads secondary variables
-rollstr, repeat, mainstringy, me= "2d20kh1+" if pargs.adv() == 1 else "1d20+", 1 if not pargs.get("rr") else int(pargs.get("rr")[0]), [], character()
+rollstr, repeat, mainstringy, me = "2d20kh1+" if pargs.adv() == 1 else "1d20+", 1 if not pargs.get("rr") else int(pargs.get("rr")[0]), [], character()
 # presets the needed counters
 me.create_cc_nx("Heat", 0, None, None, None)
 me.create_cc_nx("Street Cred", 0, None, None, None)
@@ -14,10 +14,13 @@ me.create_cc_nx("DT Slot", "0", "2", "none", "bubble")
 perctup, invetup, perftup, perstup = ("perception", me.skills.perception.value), ("investigation", me.skills.perception.value), ("performance", me.skills.performance.value), ("persuasion", me.skills.persuasion.value)
 searchbonus, searchskill, seductbonus, seductskill, perfconbonus = invetup[1] if invetup[1] > perctup[1] else perctup[1], invetup[0] if invetup[1] > perctup[1] else perctup[0], perftup[1] if perftup[1] > perstup[1] else perstup[1], perftup[0] if perftup[1] > perstup[1] else perstup[0], (perftup[1] - charismaMod) + constitutionMod
 
+# checks for guidance and adds it
+guidance = "+1d4[guidance]" if "guidance" in me.spellbook else ""
+
 # iterate through all the repeats
 for i in range(repeat):
     # build all the rolls first
-    searchroll, seductroll, perfconroll = vroll(rollstr+str(searchbonus)), vroll(rollstr+str(seductbonus)), vroll(rollstr+str(perfconbonus))
+    searchroll, seductroll, perfconroll = vroll(rollstr+str(searchbonus)+guidance), vroll(rollstr+str(seductbonus)+guidance), vroll(rollstr+str(perfconbonus)+guidance)
     # set the results for each roll
     client = "Noble" if searchroll.total >= 21 else "ModestMan" if searchroll.total >= 15 \
         else "Commoner" if searchroll.total >= 10 else "No Client Found"
@@ -28,7 +31,7 @@ for i in range(repeat):
         else f'Convinced {client} to bed' if seductroll.total >= 10 \
         else "Seduction Failed: +1 Heat"
     perfconroll = vroll("0") if client == "No Client Found" or seduct == "Seduction Failed: +1 Heat" else perfconroll
-    fuck = "No one to do it :(" if client == "No Client Found" or seduct == "No one to seduce :(" \
+    fuck = "No one to do it :(" if client == "No Client Found" or seduct == "No one to seduce :(" or seduct == "Seduction Failed: +1 Heat" \
         else f'Earth-shattering, {client} impressed: +1 Street Cred  +25% tip' if perfconroll.total  >= 21 \
         else f'Earth-shattering {client} impressed: +1 Street Cred' if perfconroll.total >= 21 and seductroll.total >= 21 \
         else f'{client} satisfied :)' if perfconroll.total >= 15 \
