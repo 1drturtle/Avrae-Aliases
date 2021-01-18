@@ -1,4 +1,4 @@
-!alias ba embed -title "Downtime Activity: Running a Business" -thumb <image> -color <color>
+embed -title "Downtime Activity: Running a Business" -thumb <image> -color <color>
 <drac2>
 ch = character()
 args = argparse(&ARGS&)
