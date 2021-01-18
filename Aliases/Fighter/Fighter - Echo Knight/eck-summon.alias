@@ -1,0 +1,31 @@
+multiline <drac2>
+out = []
+c = combat() if combat() and combat().me else None
+id_str = name[:2].upper()
+args = argparse(&ARGS&)
+# taken from Croebh's map alias
+COLORS = {"w": "white", "bk": "black", "gy": "grey", "r": "red", "g": "green", "b": "blue", "y": "yellow", "p": "purple", "pk": "pink", "c": "cyan", "bn": "brown", "o": "orange"}
+
+if c:
+	embed = f'!embed -title "{name} manifests an echo of themselves!" -desc "You can use a bonus action to magically manifest an echo of yourself in an unoccupied space you can see within 15 feet of you. This echo is a magical, translucent, gray image of you that lasts until it is destroyed, until you dismiss it as a bonus action,until you manifest another echo, or until you’re incapacitated." -f "Echo Stats|Your echo has AC 14 + your proficiency bonus, 1 hit point, and immunity to all conditions. If it has to make a saving throw, it uses your saving throw bonus for the roll. It is the same size as you, and it occupies its space. On your turn, you can mentally command the echo to move up to 30 feet in any direction (no action required). If your echo is ever more than 30 feet from you at the end of your turn, it is destroyed." -color {color} -thumb {image} -image "https://cdn.discordapp.com/attachments/524037599002624010/706954613827305564/explorers_guide_to_wildemount_subclass_guide_1.png" '
+	group = c.me.set_group(f'{id_str}Group')
+	embed += f'-f "{combat().me}|Group Set: {group}" '
+	token, color, pos = [None]*3
+	if get('eckoSummon'):
+	    token, color, pos = (eckoSummon.split('|') + [None, None, None])[:3]
+	if args.get('map'):
+		token, color, pos = (args.last('map', default='').split('|') + [token, color, pos])[:3]
+	note = []
+	if pos:
+		note.append(f'Location: {pos}')
+	note.append('Size: M')
+	if color and color in COLORS:
+		note.append(f'Color: {color} ({COLORS[color]})')
+	if token:
+		note.append(f'Token: {token}')
+	out.append(embed)
+	out.append(f'!i add 0 "{id_str}Echo" -group "{id_str}Group" -hp 1 -ac {14+proficiencyBonus} -note "{" | ".join(note)}"')
+else:
+	return f'!echo ```Ecko Summon: You are not in combat! This alias requires you to be in initiative to work!```'
+return '\n'.join(out)
+</drac2>
