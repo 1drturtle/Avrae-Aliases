@@ -41,4 +41,4 @@ new_dt = ch.mod_cc('DT Slot', -2)
 -f "Withstand Check|{{roll_withstand}}|inline"
 -f "Result|Wage: `{{wage}}` gp{{'\n'}}Hours: `{{hours}}`{{'\n'}}Total:  `{{old_coins}}` -> `{{old_coins + coins}}` gp (`{{f'{coins:+}'}}`)"
 -f "DT Slot|{{ch.cc_str('DT Slot')}}{{' (-2)' if current_dt == 2 else ''}}"
--footer "{{ctx.prefix}}{{ctx.alias}} business"
+-footer "{{ctx.prefix}}{{ctx.alias}} business | Dr Turtle#1771"
