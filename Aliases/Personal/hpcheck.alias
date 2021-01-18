@@ -26,7 +26,8 @@ for dice in hd:
             continue
         total += (averages[item[1]] + conMod)
 if args.get('b'):
-    total += sum([int(bonus) for bonus in args.get('b') if bonus.isdigit()])
+    bonus = vroll(args.join('b', '+'))
+    total += bonus.total
 if total != hp:
     test = False
 else:
@@ -34,7 +35,7 @@ else:
 ignore = args.last('i') and str(ctx.author.id) in load_json(get_svar('featsAuthorized', '[]'))
 </drac2>
 -desc "This tool compares your maximum hitpoint total to the amount you should have. For any bonuses, add `-b #`."
-{{f'-f "Current Max HP|{hp}"' if not ignore else ''}}
+{{f'-f "Current Max HP|{hp}"' if not ignore else ''}}{{f'\n-f "Added Bonus|{bonus}"' if args.get('b') else ''}}
 -f "Calculated Max HP ({{'+'.join(hd)}}+{{conMod*level}})|{{total}}"
 {{f'''-f "Equality|{'HP matches.' if test else f'HP does not match! Delta: {total-hp}'}"''' if not ignore else ''}}
 -footer "!hpcheck [-hd xdx] (-con x) (-b x) (-i) | Dr Turtle#1771"
