@@ -1,0 +1,44 @@
+!alias ba embed -title "Downtime Activity: Running a Business" -thumb <image> -color <color>
+<drac2>
+ch = character()
+args = argparse(&ARGS&)
+
+# dt if doesn't exist
+ch.create_cc_nx('DT Slot', 0, 2, None, 'bubble')
+current_dt = ch.get_cc('DT Slot')
+
+# -pb - promotion bonus
+# -wb - withstand bonus
+# adv1/2 - ephem adv
+
+skill_mod_promotion = max(ch.skills.persuasion.value, ch.skills.deception.value)
+
+roll_str_promotion = f"{['1d20', '2d20kh1', '2d20kl1'][args.adv(ephem=True)]}{skill_mod_promotion:+}{f'+{b}' if (b := args.join('pb', '+')) else ''}"
+
+skill_mod_withstand = max(ch.skills.constitution.value, (ch.skills.constitution.value + proficiencyBonus * ch.skills.performance.prof))
+
+roll_str_withstand = f"{['1d20', '2d20kh1', '2d20kl1'][args.adv(ephem=True)]}{skill_mod_promotion:+}{f'+{b}' if (b := args.join('wb', '+')) else ''}"
+
+roll_promotion = vroll(roll_str_promotion)
+roll_withstand = vroll(roll_str_withstand)
+
+wage = 20 if roll_promotion.total >= 21 else 15 if roll_promotion.total >= 15 else 10 if roll_promotion.total >= 10 else 5
+hours = 16 if roll_withstand.total >= 21 else 8 if roll_withstand.total >= 15 else 4 if roll_withstand.total >= 10 else 1
+coins = wage * hours
+old_coins = 0
+# bags
+if get('bags'):
+	json_bags = load_json(get('bags', '{}'))
+	coins_index = ([i for i, bag in enumerate(json_bags) if bag[0] == 'Coin Pouch']+[None])[0]
+	if coins_index is None:
+		err('Coin Pouch not found. Run `!coins`')
+	old_coins = json_bags[coins_index][1]['gp']
+	json_bags[coins_index][1]['gp'] += coins
+	set_cvar('bags', dump_json(json_bags))
+new_dt = ch.mod_cc('DT Slot', -2)
+</drac2>
+-f "Promotion Check|{{roll_promotion}}|inline"
+-f "Withstand Check|{{roll_withstand}}|inline"
+-f "Result|Wage: `{{wage}}` gp{{'\n'}}Hours: `{{hours}}`{{'\n'}}Total:  `{{old_coins}}` -> `{{old_coins + coins}}` gp (`{{f'{coins:+}'}}`)"
+-f "DT Slot|{{ch.cc_str('DT Slot')}}{{' (-2)' if current_dt == 2 else ''}}"
+-footer "{{ctx.prefix}}{{ctx.alias}} business"
