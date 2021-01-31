@@ -85,7 +85,7 @@ if exists('cost'):
 # Success/Fail
 R = vroll(roll_str)
 crit_type = int(R.result.crit)
-success = True if R.total >= dc else False # Check to see if we passed
+success = R.total >= dc # Check to see if we passed
 mod_amount = 0 # Init mod amount
 mentor_double = get('mentor_test', True)
 if success:             # If we succeded:
@@ -94,11 +94,10 @@ if success:             # If we succeded:
         mod_amount += 1 # Add another day
     if mentor and mentor_double:
         mod_amount *= 2 # If there's a mentor than double the progress of the day
-else:                   # If we don't succed
-    if crit_type == 2:  #   If it's a crit fail
-        mod_amount -= 1 # Take away one
-        if mentor and mentor_double:            # If there's a mentor
-            mod_amount -= 1 # Take away another point
+if crit_type == 2:  #   If it's a crit fail
+    mod_amount = -1 # Take away one
+    if mentor and mentor_double: # If there's a mentor
+        mod_amount -= 1 # Take away another point
 ch.mod_cc(train_c, mod_amount) # Modify training CC by amount determined
 
 dt_amount = get('dt', 1)
