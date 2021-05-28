@@ -1,0 +1,29 @@
+embed -thumb <image> -color <color> 
+<drac2>
+# removes all notes and effects
+a = argparse(&ARGS&)
+if not a.get('confirm'):
+    err(f'WARNING! This will remove all notes & effects from active combatants!\nRe-run with `{ctx.prefix}{ctx.alias} confirm` to confirm this action.')
+c = combat() if combat() else None
+if not c:
+    err('This channel is not in combat.')
+fields = []
+for combatant in c.combatants:
+    f = f'{combatant.name}|'
+    o = []
+    if combatant.note:
+        combatant.set_note(None)
+        o.append('Note Removed')
+    if combatant.effects:
+        s = 's' if len(combatant.effects) != 1 else ''
+        o.append(f'{len(combatant.effects)} effect{s} removed')
+        _ = [combatant.remove_effect(e.name) for e in combatant.effects]
+    if o:
+        f = '-f "' + f + ', '.join(o) + '|inline"'
+        fields.append(f)
+if not fields:
+    return '-f "Error|No combatants with effects or notes found."'
+return '\n'.join(fields)
+</drac2>
+-desc "This alias resets all notes & effects on combatants in initative."
+-footer "{{f'{ctx.prefix}{ctx.alias}'}} | Dr Turtle#1771"

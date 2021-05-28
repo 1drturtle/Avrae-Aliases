@@ -1,0 +1,41 @@
+embed -thumb <image> -color <color> -footer "{{ctx.prefix}}{{ctx.alias}} | Dr Turtle#1771"
+<drac2>
+# Alias for Sentinel at Death Door, Grave Cleric.
+data,ch,cc,args = load_json(get_gvar('c286f684-2874-487d-8528-07b2d4279a6a')),character(),'Sentinel at Death\'s Door',argparse(&ARGS&)
+rargs,c,targets = &ARGS&,combat(),args.get('t') if args.get('t') else []
+cl = '-color "ff0000"'
+if len(rargs) == 0 or (args.get('help') or args.get('?')):
+ help = data.help.deathdoor
+ return f'-title "{help.title}" -desc "{help.desc}"'
+if not (ch.cc_exists(cc) and ch.get_cc(cc)):
+ e = data.errors.no_cc.replace('#name#', name).replace('#cc#', cc).replace('#rest', 'Long Rest')
+ return f'-title "{e.title}" -desc "{e.desc}" {cl}'
+if not c:
+ e = data.errors.no_combat
+ return f'-title "{e.title}" -desc "{e.desc}" {cl}'
+if not targets:
+ e = data.errors.no_target
+ return f'-title "{e.title}" -desc "{e.desc}" {cl}'
+combatants = [c.get_combatant(t) for t in targets if c.get_combatant(t)] if c else []
+if not combatants:
+ e = data.errors.no_combatants
+ return f'-title "{e.title}" -desc "{e.desc}" {cl}"'
+damage = args.last('d')
+if not damage:
+ e = data.errors.no_damage
+ return f'-title "{e.title}" -desc "{e.desc}" {cl}'
+ch.mod_cc(cc, -1)
+if ',' in damage:
+ damage = '+'.join(damage.split(', ') if ', ' in damage else damage.split(','))
+damage = vroll(damage)
+dmg = damage.total if damage.total < 0 else (-1 * damage.total)
+damages = []
+for combatant in combatants:
+ d = combatant.damage(str(dmg))
+ damages.append((combatant, d))
+fields = ' '.join([f'-f "{a.name}|{b.damage}"' for a,b in damages])
+n = '\n'
+footer = '\n'.join([f'{a.name}: {a.hp_str() if a.hp is not None else f"Took {b.total} damage!"}' for a, b in damages]) + '\n' + f'{ctx.prefix}{ctx.alias} | Dr Turtle#1771'
+out_data = data.data.deathdoor
+return f'-title "{out_data.title.replace("#name#", name)}" -desc "{out_data.desc}" -f "{cc}|{ch.cc_str(cc)} (-1)|inline" -f "Damage|{damage}|inline" {fields} -footer "{footer}"'
+</drac2>

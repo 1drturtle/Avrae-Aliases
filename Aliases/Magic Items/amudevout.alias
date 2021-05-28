@@ -1,0 +1,23 @@
+embed <drac2>
+# Usage for Amulet of the Devout, Cleric magic item.
+ch = character()
+cc_n = 'Amulet of the Devout'
+channel_n = 'Channel Divinity'
+ch.create_cc_nx(cc_n, 0, 1, reset='long', dispType='bubble', desc='''This amulet bears the symbol of a deity inlaid with precious stones or metals. While you wear the holy symbol, you gain a +1 bonus to spell attack rolls and the saving throw DCs of your spells.\n\nWhile you wear this amulet, you can use your Channel Divinity feature without expending one of the feature’s uses. Once this property is used, it can’t be used again until the next dawn.''')
+v = ch.get_cc(cc_n)
+out = ''
+if v:
+    ch.mod_cc(cc_n, -1)
+    delta_channel = ' (+1)' if (dcc := ch.cc_exists(channel_n)) else ''
+    none_str = '*None*'
+    if dcc:
+        ch.mod_cc(channel_n, +1)
+    channel_d_str = ch.cc_str(channel_n) if dcc else none_str
+    out += f'-title "{name} uses their {cc_n}!" -desc "While you wear this amulet, you can use your Channel Divinity feature without expending one of the feature’s uses. Once this property is used, it can’t be used again until the next dawn." -f "{channel_n}|{channel_d_str}{delta_channel if dcc else None}" '
+else:
+    out += f'-title "{name} tries to use their {cc_n}!" -desc "You must wait until the next dawn before you can use this item again." '
+delta = f' (-1)' if v else ''
+out += f'-f "{cc_n}|{ch.cc_str(cc_n)}{delta}" '
+return out
+</drac2>
+-thumb <image> -color <color>

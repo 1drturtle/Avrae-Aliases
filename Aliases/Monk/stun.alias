@@ -1,0 +1,54 @@
+embed -thumb <image> -color <color> 
+<drac2>
+# Alias for Monk's Stunning Strike
+ch = character()
+c  = combat()
+a  = &ARGS&
+cc = 'Ki Points'
+
+if not a or a[0].lower() in 'help?':
+	err(f'\nAlias Help: `{ctx.prefix}{ctx.alias} <target> [-rr x] [adv/dis] [-b x] [-dc x] [-i]`')
+
+if not c:
+	err(f'Not in Combat. This alias require initiative to function.')
+if not c.me:
+	err('You are not in initiative. You must be in initiative for this alias to function.')
+
+args   = argparse(a[1:])
+target = a[:1][0]
+combatant = c.get_combatant(target)
+if not combatant:
+	err(f'Target `{target}` not found.')
+
+if not ch.get_cc(cc) and not args.get('i'):
+	err(f'No remaining Ki points. You must take a long rest before using this ability again.\n{cc}: {ch.cc_str(cc)}')
+
+# run save
+adv = args.adv(boolwise=True)
+b = (f'+{args.join("b", "+")}' if args.get('b') else '')
+dc = int(args.last('dc')) if args.get('dc') else (8 + proficiencyBonus + wisdomMod + int(get('monkDCBonus', 0)))
+save = combatant.saves.get('con').d20(base_adv=adv)
+if b:
+	save += b
+fields = [f'-f "Meta|**DC**: {dc}\nCON Save"']
+for i in range(rr := args.last('rr', type_=int, default=1)):
+	s_result = vroll(save)
+	success = s_result.total >= dc
+	field = f'-f "{combatant.name}|**CON Save**: {s_result}; {["Failure!", "Success!"][success]}'
+	ch.mod_cc(cc, -1)
+	if not success:
+		c.me.add_effect(f'Stunning {combatant.name}', '', 2 if not args.get('aoo') else 1, end=True, desc=f'{name} is **Stunning** a target until the end of their next turn.')
+		parent = c.me.get_effect(f'Stunning {combatant.name}')
+		combatant.add_effect('Stunned', '', parent=parent, desc=f'{combatant.name} is **Stunned** until the end of {c.me.name}\'s next turn.')
+		field += f'\n**Effect**: Stunned [until end of {c.me.name}\'s next turn]"'
+		fields.append(field)
+		rr = i+1
+		break
+	field += '"'
+	fields.append(field)
+fields.append(f'-f "{cc}|{ch.cc_str(cc)} (-{rr})"')
+return " ".join(fields)
+</drac2>
+-title "{{name}} uses Stunning Strike!"
+-desc "When you hit another creature with a melee weapon attack, you can spend 1 ki point to attempt a stunning strike. The target must succeed on a Constitution saving throw or be stunned until the end of your next turn."
+-footer "!stun <target> [-rr x] [adv/dis] [-b x] [-dc x] [-i] | Dr Turtle#1771"

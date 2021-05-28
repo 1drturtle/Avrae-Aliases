@@ -1,0 +1,19 @@
+embed
+-title "List of Players in Combat"
+-thumb <image> -color <color> 
+<drac2>
+# lists all combatants who: Have levels & do not have any monster levels
+if not combat():
+    err('This channel is not in combat.')
+out = []
+name_length = max([len(f'{c.name} ({c.hp_str()})') for c in combat().combatants]) + 3
+level_length = max([len(str(c.levels)) for c in combat().combatants]) + 3
+for combatant in combat().combatants:
+    if not any([level for level, value in combatant.levels if level == 'Monster']):
+        if len([x for x in combatant.levels]) != 0:
+            x = f'{combatant.name} ({combatant.hp_str()})'
+            out.append(f'- {x:<{name_length}}  {str(combatant.levels):<{level_length}}')
+desc = f'`'*3 + 'diff\n' + '\n'.join(out) + f'`'*3
+</drac2>
+-desc "{{desc}}"
+-footer "!playerlist | Dr Turtle#1771"

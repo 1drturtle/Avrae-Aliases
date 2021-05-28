@@ -1,0 +1,31 @@
+embed -color <color> -thumb <image>
+<drac2>
+# Checks to see if a specified value hit's a target AC without the player knowing the AC.
+ch   = character()
+c    = combat()
+sig  = f'Usage: `{ctx.prefix}{ctx.alias} <to-hit> [combatant]`'
+args = &ARGS&
+out  = [f'-footer "{ctx.prefix}{ctx.alias} help | Dr Turtle#1771"']
+
+if not c:
+    err(f'This channel is not in combat, so this alias cannot function.\n{sig}')
+
+if not args or 'help' in args:
+    out.append('-title "Does-Hit Help"')
+    out.append(f'-desc "Allows a player to check if a new attack hits without knowing the exact AC.\n{sig}\n `to-hit` - New value to check (supports dice).\n`combatant` - The combatant to check against. Will check against current combatant if not specified."')
+
+new_to_hit = vroll(args[0])
+co = c.get_combatant(args[1]) if len(args) > 1 else c.current
+if co is None:
+    err(f'Could not find a combatant from the input, or there is no current combatant')
+
+if not co.ac:
+    err(f'The target specified does not have an armor class. Either add one or chose a different target.')
+
+out.append('-title "Does it Hit?"')
+out.append(f'-f "New To-Hit|{new_to_hit}"')
+out.append(f'-f "Target|{co.name}"')
+out.append(f'-f "Result|The new value does {"not" if co.ac > new_to_hit.total else ""} hit!"')
+
+return ' '.join(out)
+</drac2>
