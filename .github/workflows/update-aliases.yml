@@ -1,4 +1,4 @@
-name: Update Aliases
+name: Update Avrae Collections
 on:
   push:
     branches:
@@ -7,13 +7,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - id: modifed
-      uses: jitterbit/get-changed-files@master
-      with: 
-        format: 'json'
-    - uses: 1drturtle/avrae-alias-update-action@master
-      with:
-        avrae-token: '${{ secrets.AVRAETOKEN }}'
-        alias_id_file_name: 'alias-ids.json'
-        modified-files: '${{ steps.modifed.outputs.added_modified }}'
+      - uses: actions/checkout@v2
+      - id: modified-files
+        uses: jitterbit/get-changed-files@master
+        with:
+          format: "json"
+      - uses: 1drturtle/avrae-autoupdate@main
+        with:
+          avrae_token: "${{ secrets.AVRAE_TOKEN }}"
+          collections_id_file_name: "collections.json"
+          gvars_id_file_name: "gvars.json"
+          modified_files: "${{ steps.modified-files.outputs.added_modified }}"

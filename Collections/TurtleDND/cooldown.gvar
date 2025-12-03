@@ -1,0 +1,15 @@
+
+def set_cooldown(cooldown_cvar: str, duration: int):
+    NOW = int(time()) # grab the current time as an integer
+    character().set_cvar(f"CD_{cooldown_cvar}", duration + NOW)
+    return True
+
+def is_on_cooldown(cooldown_cvar: str, duration: int) -> tuple[bool, Any]: 
+    NOW = int(time())
+    cd_value = character().get_cvar(f'CD_{cooldown_cvar}', None)
+    if cd_value is None:
+        return (False, None)
+    
+    cd_value = int(cd_value)
+
+    return ((cd_value - NOW) > 0, cd_value)
