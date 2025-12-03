@@ -30,7 +30,7 @@ CD_VAL    = int(get_svar("miningCD", 600))
 is_on_cd, cd_when = cooldown.is_on_cooldown("TD_MINING", CD_VAL)
 
 if is_on_cd:
-    output["desc"] = f"You are on cooldown for mining. Try again <t:{cd_when}:R> {ch.cvars}"
+    output["desc"] = f"You are on cooldown for mining. Try again <t:{cd_when}:R>"
     return embeds.get_output(output)
 
 cooldown.set_cooldown("TD_MINING", CD_VAL)
