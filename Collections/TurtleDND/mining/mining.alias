@@ -25,6 +25,7 @@ CD_VAL    = int(get_svar("miningCD", 600))
 
 # --- alias code ---
 
+
 # check cooldown
 is_on_cd, cd_when = cooldown.is_on_cooldown("TD_MINING", CD_VAL)
 
