@@ -19,7 +19,7 @@ output = {
 args      = argparse(&ARGS&)
 ch        = character()
 INVEST_DC = int(get_svar("gatheringInvestDC", 13))
-NATURE_DC    = int(get_svar("gatheringNatureDC", 13))
+sleight_DC    = int(get_svar("gatheringsleightDC", 13))
 CD_VAL    = int(get_svar("gatheringCD", 600))
 
 
@@ -53,17 +53,17 @@ if not invest_success:
     return embeds.get_output(output)
 
 
-# nature -> gather herbs
-nature_check = Roll.check("nature", parsed_args=args) # type: dict[str, Any]
-nature_roll = nature_check.roll # type: SimpleRollResult
-nature_success = nature_roll.total >= NATURE_DC
+# sleight -> gather herbs
+sleight_check = Roll.check("sleight", parsed_args=args) # type: dict[str, Any]
+sleight_roll = sleight_check.roll # type: SimpleRollResult
+sleight_success = sleight_roll.total >= sleight_DC
 output["fields"].append({
     "title": "Gathering Herbs",
-    "body": f"**DC**: {NATURE_DC}\n" 
-    f"**Athletics:** {nature_roll}, **{['Failure', 'Success!'][nature_success]}**",
+    "body": f"**DC**: {sleight_DC}\n" 
+    f"**Sleight of Hands:** {sleight_roll}, **{['Failure', 'Success!'][sleight_success]}**",
 })
 
-if not nature_success:
+if not sleight_success:
     output["fields"].append({
         "title": "Failure",
         "body": "You were unable to gather any herbs."

@@ -1,3 +1,3 @@
 # Mining Alias
 
-WIP
+Run `!mining` to gather Ore! Depends on Investigation and Athletics
