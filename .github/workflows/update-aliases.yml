@@ -13,9 +13,8 @@ jobs:
         with:
           python-version: "3.13"
       - name: Run Alias tests
-        run: uv tool run avrae-ls==0.6.2 --run-tests ./Collections/
-        env:
-          AVRAE_TOKEN: "${{secrets.AVRAE_TOKEN}}"
+        run: uv tool run avrae-ls==0.6.4 --run-tests ./Collections/ --token ${{secrets.AVRAE_TOKEN}}
+
   publish:
     runs-on: ubuntu-latest
     needs: [test]
