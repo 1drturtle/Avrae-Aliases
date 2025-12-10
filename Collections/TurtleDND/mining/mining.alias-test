@@ -3,7 +3,6 @@
 title: Mining!
 fields:
   - name: Looking for Ores
-    value: '**DC**: 13/\n+/**Investigation:**/(.|\n)*/'
   - name: Mining Ores
   - name: Mining Result
 ---
@@ -15,7 +14,6 @@ name: Good Case Mining
 title: Mining!
 fields:
   - name: Looking for Ores
-    value: '**DC**: 13/\n+/**Investigation:**/(.|\n)*/'
   - name: Failure
 ---
 name: Bad Case Mining
