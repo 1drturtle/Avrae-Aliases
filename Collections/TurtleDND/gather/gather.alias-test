@@ -1,0 +1,7 @@
+!gather -b 100
+---
+title: Gathering!
+fields:
+  - name: Looking for Herbs
+  - name: Gathering Herbs
+  - name: Gathering Result

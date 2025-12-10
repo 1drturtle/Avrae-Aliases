@@ -88,3 +88,4 @@ bags.save_bags()
 return embeds.get_output(output)
 
 </drac2>
+-thumb <image> -color <color>
