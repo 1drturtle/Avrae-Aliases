@@ -1,0 +1,81 @@
+#Gvar d93a8c59-e3ab-4175-bb5e-4b1aa954b672
+
+
+COUNTER_BUBBLES = {
+    "bubble": {"empty": "\u3007", "filled": "\u25c9"},  # 〇◉, spell slots
+    "square": {"empty": "\u25a2", "filled": "\u25a3"},  # ▢▣, pact slots
+    "hex": {"empty": "\u2b21", "filled": "\u2b22"},  # ⬡⬢
+    "star": {"empty": "\u2606", "filled": "\u2605"},  # ☆★
+}
+
+def create_ucc(name: str, minVal: str = None, maxVal: str = None, reset: str = None, dispType: str = None):
+    """Creates a UCC (User Custom Counter)
+
+    Args:
+        name (str): Name of the UCC
+        minVal (str, optional): Minimum Value of the UCC. Defaults to None.
+        maxVal (str, optional): Maximum Value of the UCC. Determines initial value. Defaults to None.
+        reset (str, optional): How to reset. Defaults to None.
+        dispType (str, optional): How to display. Defaults to None.
+
+    Returns:
+        dict[str, Any]: Newly created UCC
+    """
+    uccData = load_json(get_uvar("uccData", default="{}"))
+    newUcc = {
+        "name": name,
+        "value": maxVal if maxVal else 0,
+        "minVal": minVal,
+        "maxVal": maxVal,
+        "reset": reset,
+        "dispType": dispType
+    }
+    uccData[name] = newUcc
+    set_uvar("uccData", dump_json(uccData))
+    return newUcc
+
+def create_ucc_nx(name: str, minVal: str = None, maxVal: str = None, reset: str = None):
+    uccData = load_json(get_uvar("uccData", default="{}"))
+    if name not in uccData:
+        return create_ucc(name, minVal, maxVal, reset)
+    return uccData[name]
+
+def ucc_exists(name: str):
+    uccData = load_json(get_uvar("uccData", default="{}"))
+    return name in uccData
+
+def mod_ucc(name: str, value: int):
+    uccData = load_json(get_uvar("uccData", default="{}"))
+    if name not in uccData:
+        return None
+
+    prevValue = int(uccData[name]["value"])
+    uccData["name"]["value"] = value + prevValue
+    set_uvar("uccData", dump_json(uccData))
+
+def ucc_str(name: str):
+    uccData = load_json(get_uvar("uccData", default="{}"))
+    if name not in uccData:
+        return None
+
+    uccData = uccData[name]
+    dispType, maxVal = uccData["dispType"], uccData["maxVal"]
+
+    if dispType is None:
+        out = str(uccData["value"])
+        if maxVal is not None:
+            out += f"/{maxVal}"    
+        return out
+    
+    if dispType not in COUNTER_BUBBLES or maxVal is None:
+        return None
+
+    # TODO: maxVal evaluation
+    maxVal = int(maxVal)
+    val = int(uccData["value"])
+    emptyAmt = maxVal - val
+    if emptyAmt < 0:
+        return None
+
+    empty, full = COUNTER_BUBBLES[dispType]["empty"], COUNTER_BUBBLES[dispType]["filled"]
+    return f"{full*val}{empty*emptyAmt}"

@@ -1,0 +1,6 @@
+{
+    "enableGvarFetch": true,
+    "avraeService": {
+        "token": "$AVRAE_TOKEN"
+    }
+}
